@@ -1,0 +1,103 @@
+%
+% latex2dnd tex code
+%
+% use \input{latex2dnd} to include this at the top of your tex file
+%
+
+\usepackage{zref-user}
+\usepackage{zref-abspos}
+\usepackage{tikz}
+\usepackage{forloop}
+\usepackage{calc}
+\usepackage{newfile}
+\usepackage{ifthen}
+
+\newoutputstream{dnd}
+\openoutputfile{\jobname.dnd}{dnd}
+
+\newcounter{BoxCount}
+\setcounter{BoxCount}{0}
+\newcounter{I}
+
+\pagestyle{empty}
+\usetikzlibrary{calc}
+
+\newcommand\DDlabel[2]{%
+  % #1 = label name
+  % #2 = label contents, e.g. math symbols or word
+  \stepcounter{BoxCount}%
+  \expandafter\newsavebox\expandafter{\csname BOX\alph{BoxCount}\endcsname}%
+  \expandafter\sbox\expandafter{\csname BOX\alph{BoxCount}\endcsname}{{#2}}%
+  \expandafter\edef\csname BOXName#1\endcsname{\csname BOX\alph{BoxCount}\endcsname}%
+  \addtostream{dnd}{LABEL: \arabic{BoxCount} = #1}%
+}%
+
+\newcommand{\writeDDlabels}[1][4.3ex]{
+  % write out drag-drop labels
+  % arguments:
+  %
+  % #1 = box height (optional, defaults to 4.3ex)
+  \newpage
+  TOP \par
+  \stepcounter{BoxCount}%
+  \setcounter{I}{1}%
+  \forloop{I}{1}{\value{I} < \value{BoxCount}}{%
+    \typeout{LABEL\arabic{I}}%
+    \edef\ddlabel{LABEL\arabic{I}}%
+    \ddlabel: \DDboxAutoWhite[#1]{\ddlabel}{\usebox{\csname BOX\alph{I}\endcsname}}\par
+    % \ddlabel: \DDboxGen[white]{\ddlabel}{7ex}{4ex}{\usebox{\csname BOX\alph{I}\endcsname}}\par
+  }%
+  BOTTOM \par
+  \closeoutputstream{dnd}%
+}
+
+\newwrite\mywrite
+\openout\mywrite=\jobname.pos\relax
+\newif\ifddhidebox
+
+% by default, all math inline; this can change that behavior
+%\everymath{\displaystyle}
+
+\newcommand{\DDboxGen}[5][blue]{%
+    % generic drag-drop box
+    %
+    % #1 = optional color for box line
+    % #2 = box target name
+    % #3 = width
+    % #4 = height
+    % #5 = text to output inside box
+    \typeout{Box #1: #2 by #3, text=#4}%
+    \begin{tikzpicture}[color=#1, line width=0.25mm, baseline]
+        \draw [dashed] (-0.5,-0.25)
+            node {\zsavepos{box#2-ll}}
+            rectangle (#3,#4)
+            node {\zsavepos{box#2-ur}};
+        \draw (0,0)
+            node (EQ) [anchor=base] {#5};
+    \write\mywrite{box#2: \zposx{box#2-ll}, \zposy{box#2-ll}, \zposx{box#2-ur}, \zposy{box#2-ur}}%
+    \end{tikzpicture}%
+}
+
+\newcommand{\DDbox}[4]{%
+    % drag-drop box, with same arguments as \DDboxGen, but #4 is a label name
+    \addtostream{dnd}{BOX: #1 = #4}%
+    \DDboxGen{#1}{#2}{#3}{\expandafter\usebox{\csname BOXName#4\endcsname}}%
+}
+
+\newlength\bwidth
+\newlength\bheight
+
+\newcommand{\DDboxAutoWhite}[3][auto]{%
+    % drag-drop box, with auto-width
+    % #1 = box height (optional)
+    % #2 = box target name
+    % #3 = box contents
+    \setlength{\bwidth}{\widthof{#3}+1.6ex}%
+    % \setlength{\bheight}{\totalheightof{#2}+1.5ex}%
+    \ifthenelse{\equal{#1}{auto}}{
+      \setlength{\bheight}{\heightof{#3}+1.75ex}%
+    }{
+      \setlength{\bheight}{#1}%
+    }
+    \DDboxGen[white]{#2}{\bwidth}{\bheight}{#3}%
+}

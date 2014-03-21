@@ -1,0 +1,5 @@
+include latex2dnd/*.py
+include latex2dnd/tex/*
+include latex2dnd/test/*.py
+include latex2dnd/testtex/*
+
