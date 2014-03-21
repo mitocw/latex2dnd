@@ -357,7 +357,8 @@ class LatexToDragDrop(object):
         boxes to make the dnd image.
         '''
         self.dndpi = PageImage(self.pdffn, page=1, imfn=self.solimfn, dpi=self.dpi, verbose=self.imverbose)
-        self.dndpi.NegateBox(self.BoxSet['box1'], outfn='test.png')
+        # old test
+        #self.dndpi.NegateBox(self.BoxSet['box1'], outfn='test.png')
         self.dndpi.WhiteBox([ self.BoxSet['box'+n] for n in self.box_answers], outfn=self.dndimfn)
 
     def generate_label_images(self, outdir='.'):
