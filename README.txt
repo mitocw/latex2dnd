@@ -14,6 +14,8 @@ Note that pdftoppm is needed.  With osX and macbrew:
 
     brew install netpbm poppler
 
+A working latex installation is also required.
+
 Usage
 =====
 
@@ -37,4 +39,4 @@ Options:
 History
 =======
 
-* v0.9: python package
+* v0.9: python package, with unit tests
