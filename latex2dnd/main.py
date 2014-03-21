@@ -493,7 +493,7 @@ def CommandLine():
                       action="store",
                       dest="resolution",
                       default="300",
-                      help="Resolution of PNG files in DPI",)
+                      help="Resolution of PNG files in DPI (default 300)",)
     (opts, args) = parser.parse_args()
 
     if len(args)<1:
