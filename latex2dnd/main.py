@@ -255,9 +255,15 @@ class LatexToDragDrop(object):
             mydir = os.path.dirname(__file__)
             texpath = os.path.abspath(mydir + '/tex')
             os.environ['TEXINPUTS'] = "::%s" % texpath
+            if verbose:
+                print "Adding %s to TEXINPUTS" % texpath
+                print "Running latex twice"
+                print "-"*77
             # run pdflatex TWICE
             os.system('pdflatex %s' % texfn)
             os.system('pdflatex %s' % texfn)
+            if verbose:
+                print "="*77
 
         outdir = path(outdir)
 
