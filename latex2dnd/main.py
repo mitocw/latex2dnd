@@ -100,7 +100,7 @@ class PageImage(object):
         '''
         # make sure box is set for context of this image
         box.offset_by_bb(self.hrbb) 
-        geom = box.png_geom(self.sizex)
+        geom = box.png_geom(self.sizex, self.sizey)
         
         if outfn is None:
             outfn = self.imfn
@@ -127,7 +127,7 @@ class PageImage(object):
         for box in boxes:
             # make sure box is set for context of this image
             box.offset_by_bb(self.hrbb) 
-            geom = box.png_geom(self.sizex, delta=4.5)
+            geom = box.png_geom(self.sizex, self.sizey, delta=4.5)
 
             regions.append('-region {geom} -threshold -1 '.format(geom=geom))
 
@@ -144,7 +144,7 @@ class PageImage(object):
         '''
         # make sure box is set for context of this image
         box.offset_by_bb(self.hrbb) 
-        geom = box.png_geom(self.sizex, delta=4.5)
+        geom = box.png_geom(self.sizex, self.sizey, delta=4.5)
         
         if outfn is None:
             outfn = self.imfn[:-4] + '_extract.png'
@@ -200,12 +200,18 @@ class Box(object):
         self.pos[1] -= dy
         self.pos[3] -= dy
 
-    def png_pos(self, imx):
+    def png_pos(self, imx, imy):
         '''
         return list of [llx, lly, urx, ury] for pixel position of box
         in image.  uses upper left as (0,0)
+
+        for the conversion factor, choose the larger of imx or imy,
+        to get greater accuracy (less roundoff)
         '''
-        cf = imx / (self.hrbb[2]-self.hrbb[0])
+        if imx > imy:
+            cf = (1.0 * imx) / (self.hrbb[2]-self.hrbb[0])
+        else:
+            cf = (1.0 * imy) / (self.hrbb[3]-self.hrbb[1])
         self.cf = cf
         ysize = self.hrbb[3]-self.hrbb[1]  # y-size of source image, in inches
 
@@ -214,7 +220,7 @@ class Box(object):
         return map(in_to_px, [self.pos[0], ysize-self.pos[1], self.pos[2], ysize-self.pos[3]])
 
 
-    def png_geom(self, imx, delta=0):
+    def png_geom(self, imx, imy, delta=0):
         '''
         return geometry string for box, in units of pixels (for PNG file)
         it is assumed that the PNG file has a width which imx which is
@@ -222,7 +228,7 @@ class Box(object):
 
         the geometry string uses a coordinate system with (0,0) in the upper left
         '''
-        pp = self.png_pos(imx)
+        pp = self.png_pos(imx, imy)
         dx = int(pp[2] - pp[0] - 2*delta)
         dy = int(pp[1] - pp[3] - 2*delta)
         geom = '%dx%d+%d+%d' % (dx, dy, int(pp[0]+delta), int(pp[3]+4+delta))
@@ -331,7 +337,7 @@ class LatexToDragDrop(object):
             target.set('id', tname)
             box = self.BoxSet['box' + tname]
             box.offset_by_bb(self.dndpi.hrbb)
-            pos = box.png_pos(self.dndpi.sizex)
+            pos = box.png_pos(self.dndpi.sizex, self.dndpi.sizey)
 
             target.set('x', str(pos[0]))
             target.set('y', str(pos[3]))
