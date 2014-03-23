@@ -160,3 +160,4 @@ History
 
 * v0.9.0: python package, with unit tests
 *     .1: add -C (can_reuse) flag
+*     .2: improved box alignment and pixel position computation
