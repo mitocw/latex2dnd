@@ -245,7 +245,8 @@ class LatexToDragDrop(object):
 
     '''
     
-    def __init__(self, texfn, compile=True, verbose=True, dpi=300, imverbose=False, outdir='.'):
+    def __init__(self, texfn, compile=True, verbose=True, dpi=300, imverbose=False, outdir='.',
+                 can_reuse=False):
         '''
         texfn = *.tex filename
         '''
@@ -268,6 +269,7 @@ class LatexToDragDrop(object):
 
         self.verbose = verbose
         self.imverbose = imverbose
+        self.can_reuse = can_reuse
         self.texfn = texfn
         self.fnpre = path(texfn[:-4])
         self.pdffn = self.fnpre + '.pdf'
@@ -314,6 +316,8 @@ class LatexToDragDrop(object):
             draggable = etree.SubElement(dnd, 'draggable')
             draggable.set('id', label)
             draggable.set('icon', self.imdir + self.labels[labnum].basename())
+            if self.can_reuse:
+                draggable.set('can_reuse', 'true')
         
         anskey = []
         for tname, aname in self.box_answers.items():
@@ -470,6 +474,10 @@ def CommandLine():
                       dest='very_verbose', 
                       default=False, action='store_true',
                       help='very verbose messages')
+    parser.add_option('-C', '--can-reuse-labels', 
+                      dest='can_reuse', 
+                      default=False, action='store_true',
+                      help='allow draggable labels to be reusable')
     parser.add_option('-s', '--skip-latex-compilation', 
                       dest='skip_latex', 
                       default=False, action='store_true',
@@ -506,7 +514,8 @@ def CommandLine():
                           verbose=opts.verbose, 
                           dpi=opts.resolution,
                           outdir=opts.output_dir,
-                          imverbose=opts.very_verbose)
+                          imverbose=opts.very_verbose,
+                          can_reuse=opts.can_reuse)
 
 if __name__=="__main__":
     CommandLine()

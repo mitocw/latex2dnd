@@ -27,6 +27,8 @@ Options:
   -h, --help            show this help message and exit
   -v, --verbose         verbose messages
   -V, --very-verbose    very verbose messages
+  -C, --can-reuse-labels
+                        allow draggable labels to be reusable
   -s, --skip-latex-compilation
                         skip latex compilation
   -d OUTPUT_DIR, --output-directory=OUTPUT_DIR
@@ -156,4 +158,5 @@ Note that more labels are defined than just the correct ones.  This is the XML g
 History
 =======
 
-* v0.9: python package, with unit tests
+* v0.9.0: python package, with unit tests
+*     .1: add -C (can_reuse) flag
