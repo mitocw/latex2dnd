@@ -68,12 +68,13 @@
     % #5 = text to output inside box
     \typeout{Box #1: #2 by #3, text=#4}%
     \begin{tikzpicture}[color=#1, line width=0.25mm, baseline]
-        \draw [dashed] (-0.5,-0.25)
+        \draw [dashed] (0,-0.25)
             node {\zsavepos{box#2-ll}}
             rectangle (#3,#4)
             node {\zsavepos{box#2-ur}};
         \draw (0,0)
-            node (EQ) [anchor=base] {#5};
+            %node (EQ) [anchor=base] {#5};	% cuts off left side
+            node (EQ) [anchor=base west] {#5};	% aligns to west baseline
     \write\mywrite{box#2: \zposx{box#2-ll}, \zposy{box#2-ll}, \zposx{box#2-ur}, \zposy{box#2-ur}}%
     \end{tikzpicture}%
 }
@@ -92,7 +93,7 @@
     % #1 = box height (optional)
     % #2 = box target name
     % #3 = box contents
-    \setlength{\bwidth}{\widthof{#3}+1.6ex}%
+    \setlength{\bwidth}{\widthof{#3}+1.8ex}%
     % \setlength{\bheight}{\totalheightof{#2}+1.5ex}%
     \ifthenelse{\equal{#1}{auto}}{
       \setlength{\bheight}{\heightof{#3}+1.75ex}%
@@ -100,4 +101,5 @@
       \setlength{\bheight}{#1}%
     }
     \DDboxGen[white]{#2}{\bwidth}{\bheight}{#3}%
+    %\DDboxGen[green]{#2}{\bwidth}{\bheight}{#3}%  use this for debugging
 }
