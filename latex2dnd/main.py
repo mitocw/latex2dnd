@@ -351,12 +351,26 @@ class LatexToDragDrop(object):
 
         answer = etree.SubElement(cr, 'answer')
 
-        answer.text = ('\ncaset = %s\n' % repr(anskey) + 
-                       'ca = [ {"draggables": ca.keys(),"targets": ca.values(),"rule":"exact"} for ca in caset ]\n'
-                       'if draganddrop.grade(submission[0], ca):\n'
-                       '    correct = ["correct"]\n'
-                       'else:\n'
-                       '    correct = ["incorrect"]\n')
+        if not self.can_reuse:
+            cacode = ('ca = [ {"draggables": ca.keys(),"targets": ca.values(),"rule":"exact"} for ca in caset ]\n'
+                      'if draganddrop.grade(submission[0], ca):\n'
+                      '    correct = ["correct"]\n'
+                      'else:\n'
+                      '    correct = ["incorrect"]\n')
+        else:
+            cacode = ('# custom checking for reusable labels - assumes all targets get some label\n'
+                      'import json\n'
+                      'ans = json.loads(submission[0])\n'
+                      "correct = ['correct']\n"
+                      "for rule in caset:\n"
+                      "    if rule not in ans:\n"
+                      "        correct = ['incorrect']\n"
+                      "        break\n"
+                      "\n"
+                      "# use this for debugging\n"
+                      "# messages = ['ans=%s' % submission[0]]\n")
+
+        answer.text = '\ncaset = %s\n' % repr(anskey) + cacode
 
         sol = etree.SubElement(xml, 'solution')
         img = etree.SubElement(sol, 'img')
