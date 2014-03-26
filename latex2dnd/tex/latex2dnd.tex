@@ -72,9 +72,11 @@
             node {\zsavepos{box#2-ll}}
             rectangle (#3,#4)
             node {\zsavepos{box#2-ur}};
-        \draw (0,0)
+        %\draw (0,0)
+        \draw (#3/2,0.04)	% center of rectangle, slightly raised
             %node (EQ) [anchor=base] {#5};	% cuts off left side
-            node (EQ) [anchor=base west] {#5};	% aligns to west baseline
+            %node (EQ) [anchor=base west] {#5};	% aligns to west baseline
+            node (EQ) [anchor=base] {#5};	% aligns to center baseline
     \write\mywrite{box#2: \zposx{box#2-ll}, \zposy{box#2-ll}, \zposx{box#2-ur}, \zposy{box#2-ur}}%
     \end{tikzpicture}%
 }
