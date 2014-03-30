@@ -29,7 +29,18 @@
   \expandafter\newsavebox\expandafter{\csname BOX\alph{BoxCount}\endcsname}%
   \expandafter\sbox\expandafter{\csname BOX\alph{BoxCount}\endcsname}{{#2}}%
   \expandafter\edef\csname BOXName#1\endcsname{\csname BOX\alph{BoxCount}\endcsname}%
-  \addtostream{dnd}{LABEL: \arabic{BoxCount} = #1}%
+  \addtostream{dnd}{LABEL: \arabic{BoxCount} = #1 /// #2}%
+}%
+
+\newcommand\DDformula[4]{%
+  % #1 = formula format string, using square brackets instead of braces
+  % #2 = samples string (e.g. 'v,g,theta@1,1,1:20,20,20#30')
+  % #3 = expected answer formula (e.g. 'v^2/g * cos(theta) * sin(theta)')
+  % #4 = error message to output when answer incorrect (can be empty)
+  \addtostream{dnd}{FORMULA: #1}%
+  \addtostream{dnd}{FORMULA_SAMPLES: #2}%
+  \addtostream{dnd}{FORMULA_EXPECT: #3}%
+  \addtostream{dnd}{FORMULA_ERR: #4}%
 }%
 
 \newcommand{\writeDDlabels}[1][4.3ex]{

@@ -6,6 +6,7 @@ def findfiles(pat):
     return [x for x in glob.glob('share/' + pat)]
 
 data_files = [
+    ('share/lib', findfiles('lib/*')),
     ('share/tex', findfiles('tex/*')),
     ('share/testtex', findfiles('testtex/*')),
     ]

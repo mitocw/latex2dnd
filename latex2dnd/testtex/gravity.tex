@@ -1,0 +1,35 @@
+% 
+% example file for latex2dnd
+% this version uses formula checking
+%
+
+\documentclass{article}
+% \usepackage{amsmath}
+\input{latex2dnd}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+% define drag-drop labels
+
+\DDlabel{G}{$G$}
+\DDlabel{m1}{$m_1$}
+\DDlabel{m2}{$m_2$}
+\DDlabel{d}{$d$}
+\DDlabel{d2}{$d^2$}
+
+% shorthand macro to make all boxes the same size (6 by 4)
+\newcommand\DDB[2]{\DDbox{#1}{6ex}{4ex}{#2}}
+
+% the formula with boxes
+$$F = \frac{\DDB{1}{G} \DDB{2}{m1}\DDB{3}{m2}}{\DDB{4}{d2}}$$
+
+% the formula to use for correctness checking, the samples, the expected answer, and the error message
+% place target_id names inside square brackets
+\DDformula{ [1] * [2] * [3] / [4] }{ G,m_1,m_2,d@1,1,1,1:20,20,20,20\#40 }{G*m_1*m_2/d^2}{}
+
+% output labels, with fixed box heights
+\writeDDlabels[4.3ex]
+
+\end{document}

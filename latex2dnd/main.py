@@ -349,29 +349,71 @@ class LatexToDragDrop(object):
             # anskey is a list of {draggable_id : target_id}
             anskey.append({aname: tname})
 
-        answer = etree.SubElement(cr, 'answer')
+        # if self.dnd_formula is not {}, then use a formula for checking, 
+        # with customresponse script code, instead of the default
+        # dnd grader.
 
-        if not self.can_reuse:
-            cacode = ('ca = [ {"draggables": ca.keys(),"targets": ca.values(),"rule":"exact"} for ca in caset ]\n'
-                      'if draganddrop.grade(submission[0], ca):\n'
-                      '    correct = ["correct"]\n'
-                      'else:\n'
-                      '    correct = ["incorrect"]\n')
+        if self.dnd_formula:
+            
+            cfn = 'check_%s' % self.fnpre.basename()
+            cr.set('cfn', cfn)
+            
+            script = etree.SubElement(xml, 'script')
+            script.set('type', "text/python")
+
+            mydir = os.path.dirname(__file__)
+            libpath = path(os.path.abspath(mydir + '/lib'))
+            check_code = open(libpath / 'dnd_formulacheck.py').read()
+
+            # map from draggable labels to label formula contents
+            dmap = {}
+            for lname, lsym in self.dnd_label_contents.items():
+                lsym = lsym.strip()
+                if lsym.startswith('$') and lsym.endswith('$'):
+                    lsym = lsym[1:-1]
+                dmap[lname] = lsym
+
+            dndf = self.dnd_formula
+            info = {'CHECK_FUNCTION': cfn,
+                    'CHECK_DMAP': repr(dmap),
+                    'CHECK_FORMULA': repr(dndf['formula']),
+                    'CHECK_SAMPLES': repr(dndf['samples']),
+                    'CHECK_EXPECT': repr(dndf['expect']),
+                    'CHECK_ERROR_MSG': dndf['err'],
+                    }
+
+            for key, val in info.items():
+                check_code = check_code.replace(key, val)
+            script.text = '\n' + check_code
+            if self.verbose:
+                print script.text
+
         else:
-            cacode = ('# custom checking for reusable labels - assumes all targets get some label\n'
-                      'import json\n'
-                      'ans = json.loads(submission[0])\n'
-                      "correct = ['correct']\n"
-                      "for rule in caset:\n"
-                      "    if rule not in ans:\n"
-                      "        correct = ['incorrect']\n"
-                      "        break\n"
-                      "\n"
-                      "# use this for debugging\n"
-                      "# messages = ['ans=%s' % submission[0]]\n")
 
-        answer.text = '\ncaset = %s\n' % repr(anskey) + cacode
-
+            # use default dnd grader
+            answer = etree.SubElement(cr, 'answer')
+    
+            if not self.can_reuse:
+                cacode = ('ca = [ {"draggables": ca.keys(),"targets": ca.values(),"rule":"exact"} for ca in caset ]\n'
+                          'if draganddrop.grade(submission[0], ca):\n'
+                          '    correct = ["correct"]\n'
+                          'else:\n'
+                          '    correct = ["incorrect"]\n')
+            else:
+                cacode = ('# custom checking for reusable labels - assumes all targets get some label\n'
+                          'import json\n'
+                          'ans = json.loads(submission[0])\n'
+                          "correct = ['correct']\n"
+                          "for rule in caset:\n"
+                          "    if rule not in ans:\n"
+                          "        correct = ['incorrect']\n"
+                          "        break\n"
+                          "\n"
+                          "# use this for debugging\n"
+                          "# messages = ['ans=%s' % submission[0]]\n")
+    
+            answer.text = '\ncaset = %s\n' % repr(anskey) + cacode
+    
         sol = etree.SubElement(xml, 'solution')
         img = etree.SubElement(sol, 'img')
         img.set('src', self.imdir + self.solimfn.basename())
@@ -422,7 +464,9 @@ class LatexToDragDrop(object):
         We'll use those names in the XML file.
         '''
         self.dnd_labels = OrderedDict()
+        self.dnd_label_contents = OrderedDict()
         self.box_answers = OrderedDict()
+        self.dnd_formula = {}
 
         dndfn = self.fnpre + '.dnd'
 
@@ -431,16 +475,35 @@ class LatexToDragDrop(object):
             raise "latex2dnd_error"
 
         for k in open(dndfn):
-            m = re.search('LABEL: ([0-9]+) = (.*)', k)
+            m = re.search('LABEL: ([0-9]+) = (.*) /// (.*)', k)
             if m:
                 # 1 = label number
                 # 2 = label name
+                # 3 = label contents (math symbols or word)
                 self.dnd_labels[m.group(2)] = m.group(1)
+                self.dnd_label_contents[m.group(2)] = m.group(3)
             m = re.search('BOX: ([^ ]+) = (.*)', k)
             if m:
                 # 1 = box name
                 # 2 = answer label name
                 self.box_answers[m.group(1)] = m.group(2)
+            m = re.search('FORMULA: (.*)', k)
+            if m:
+                #1 = formula to use in checking
+                # fix formula, replace square with curly brackets,
+                # add underscore in front of numerical ids
+                formula = m.group(1).replace('[','{').replace(']','}').strip()
+                formula = re.sub('\{([0-9]+)\}','{_\\1}', formula)
+                self.dnd_formula['formula'] = formula
+            m = re.search('FORMULA_SAMPLES: (.*)', k)
+            if m:
+                self.dnd_formula['samples'] = m.group(1).strip().replace('\\#','#')
+            m = re.search('FORMULA_EXPECT: (.*)', k)
+            if m:
+                self.dnd_formula['expect'] = m.group(1)
+            m = re.search('FORMULA_ERR: (.*)', k)
+            if m:
+                self.dnd_formula['err'] = m.group(1)
 
         if self.verbose:
             print "  %s target boxes" % len(self.box_answers)
