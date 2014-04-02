@@ -30,11 +30,14 @@
   \expandafter\newsavebox\expandafter{\csname BOX\alph{BoxCount}\endcsname}%
   \expandafter\sbox\expandafter{\csname BOX\alph{BoxCount}\endcsname}{{#3}}%
   \expandafter\edef\csname BOXName#2\endcsname{\csname BOX\alph{BoxCount}\endcsname}%
-  \ifthenelse{\equal{#1}{UseContents}}{
-    \addtostream{dnd}{LABEL: \arabic{BoxCount} = #2 /// #3}%
-  }{
-    \addtostream{dnd}{LABEL: \arabic{BoxCount} = #2 /// #1}%
-  }
+  \ifthenelse{\equal{#1}{DO_NOT_SHOW}}{%
+  }{%
+    \ifthenelse{\equal{#1}{UseContents}}{%
+      \addtostream{dnd}{LABEL: \arabic{BoxCount} = #2 /// #3}%
+    }{%
+      \addtostream{dnd}{LABEL: \arabic{BoxCount} = #2 /// #1}%
+    }%
+  }%
 }%
 
 \newcommand\DDformula[4]{%
