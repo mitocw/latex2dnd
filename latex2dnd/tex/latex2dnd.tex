@@ -22,14 +22,19 @@
 \pagestyle{empty}
 \usetikzlibrary{calc}
 
-\newcommand\DDlabel[2]{%
-  % #1 = label name
-  % #2 = label contents, e.g. math symbols or word
+\newcommand\DDlabel[3][UseContents]{%
+  % #1 = label formula symbol (for formula check grading, optional, defaults to #3)
+  % #2 = label name
+  % #3 = label contents, e.g. math symbols or word
   \stepcounter{BoxCount}%
   \expandafter\newsavebox\expandafter{\csname BOX\alph{BoxCount}\endcsname}%
-  \expandafter\sbox\expandafter{\csname BOX\alph{BoxCount}\endcsname}{{#2}}%
-  \expandafter\edef\csname BOXName#1\endcsname{\csname BOX\alph{BoxCount}\endcsname}%
-  \addtostream{dnd}{LABEL: \arabic{BoxCount} = #1 /// #2}%
+  \expandafter\sbox\expandafter{\csname BOX\alph{BoxCount}\endcsname}{{#3}}%
+  \expandafter\edef\csname BOXName#2\endcsname{\csname BOX\alph{BoxCount}\endcsname}%
+  \ifthenelse{\equal{#1}{UseContents}}{
+    \addtostream{dnd}{LABEL: \arabic{BoxCount} = #2 /// #3}%
+  }{
+    \addtostream{dnd}{LABEL: \arabic{BoxCount} = #2 /// #1}%
+  }
 }%
 
 \newcommand\DDformula[4]{%
