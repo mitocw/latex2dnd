@@ -1,3 +1,4 @@
+import string
 import random
 from math import *
 from calc import evaluator
@@ -23,7 +24,7 @@ def is_formula_equal(expected, given, samples, cs=True, tolerance=0.01):
             return False
     return True
     
-def dnd_check_formula(expect, ans, draggable_map, target_formula, samples):
+def dnd_check_formula(expect, ans, draggable_map, target_formula, samples, options=None):
 
     # construct symbolic expression from drag-and-drop result, given
     # targets in numerator and denominator
@@ -31,8 +32,12 @@ def dnd_check_formula(expect, ans, draggable_map, target_formula, samples):
     # draggable_map maps from draggable_id to math symbol
     # target_formula is a format string which places target_id into a formula
     # samples = sample string for numerical checking
+    #
+    # the code in this procedure should be independent of a specific DND problem.
 
     anslist = json.loads(ans)
+    if options is None:
+        options = {}
 
     target_syms = {}
     for dnddict in anslist:
@@ -46,11 +51,21 @@ def dnd_check_formula(expect, ans, draggable_map, target_formula, samples):
             pass
         target_syms[tid] = draggable_map[did]
 
-    try:
-        expr = target_formula.format(**target_syms)
-    except Exception as err:
-        msg = "<br/>Sorry, your input is incomplete "
-        return {'ok': False, 'msg': msg}
+    if options.get('allow_empty', False):
+        # dict which defaults to "1" if key missing
+        # allows empty factors in formula to be treated as the multiplicative identity
+        class SD(dict):
+            def __missing__(self, key):
+                return '1'
+        tsdict = SD()
+        tsdict.update(target_syms)
+        expr = string.Formatter().vformat(target_formula, (), tsdict)
+    else:
+        try:
+            expr = target_formula.format(**target_syms)
+        except Exception as err:
+            msg = "<br/>Sorry, your input is incomplete "
+            return {'ok': False, 'msg': msg}
 
     msg = 'You have input the expression: %s' % expr
     ok = False
@@ -60,7 +75,7 @@ def dnd_check_formula(expect, ans, draggable_map, target_formula, samples):
         msg += "<br/>error %s" % str(err).replace('>','&gt;')
 
     if not ok:
-        msg += '<br/><font color="red">CHECK_ERROR_MSG</font>'
+        msg += '<br/><font color="red">%s</font>' % options.get('err_msg', '')
 
     # ret = {'ok': False, 'msg': 'ans=%s' % ans}
     ret = {'ok': ok, 'msg': msg}
@@ -71,9 +86,12 @@ def CHECK_FUNCTION(expect, ans, dcf=dnd_check_formula):
     formula = CHECK_FORMULA
     samples = CHECK_SAMPLES
     expect = CHECK_EXPECT
+    options = {'allow_empty': OPTION_ALLOW_EMPTY,
+               'err_msg': CHECK_ERROR_MSG,
+    }
 
     # call dnd_check_formula to do mapping from dnd to formual and to test expression
-    return dcf(expect, ans, dmap, formula, samples)
+    return dcf(expect, ans, dmap, formula, samples, options)
 
 # keep note of check function for other hinting code
 dnd_check_function = CHECK_FUNCTION

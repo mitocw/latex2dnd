@@ -279,9 +279,10 @@ class LatexToDragDrop(object):
             print "Error: output directory '%s' is not a directory" % outdir
             return
 
+        self.options = {}
         self.verbose = verbose
         self.imverbose = imverbose
-        self.can_reuse = can_reuse
+        self.options['can_reuse'] = can_reuse
         self.texfn = texfn
         self.fnpre = path(texfn[:-4])
         self.pdffn = self.fnpre + '.pdf'
@@ -328,7 +329,7 @@ class LatexToDragDrop(object):
             draggable = etree.SubElement(dnd, 'draggable')
             draggable.set('id', label)
             draggable.set('icon', self.imdir + self.labels[labnum].basename())
-            if self.can_reuse:
+            if self.options.get('can_reuse', False):
                 draggable.set('can_reuse', 'true')
         
         anskey = []
@@ -379,7 +380,8 @@ class LatexToDragDrop(object):
                     'CHECK_FORMULA': repr(dndf['formula']),
                     'CHECK_SAMPLES': repr(dndf['samples']),
                     'CHECK_EXPECT': repr(dndf['expect']),
-                    'CHECK_ERROR_MSG': dndf['err'],
+                    'CHECK_ERROR_MSG': repr(dndf['err']),
+                    'OPTION_ALLOW_EMPTY': repr(self.options.get('allow_empty', False))
                     }
 
             for key, val in info.items():
@@ -393,7 +395,7 @@ class LatexToDragDrop(object):
             # use default dnd grader
             answer = etree.SubElement(cr, 'answer')
     
-            if not self.can_reuse:
+            if not self.options.get('can_reuse', False):
                 cacode = ('ca = [ {"draggables": ca.keys(),"targets": ca.values(),"rule":"exact"} for ca in caset ]\n'
                           'if draganddrop.grade(submission[0], ca):\n'
                           '    correct = ["correct"]\n'
@@ -462,6 +464,8 @@ class LatexToDragDrop(object):
         It also lists all the labels, and their author-given names.
 
         We'll use those names in the XML file.
+
+        This file may provide configuration options specified by the author.
         '''
         self.dnd_labels = OrderedDict()
         self.dnd_label_contents = OrderedDict()
@@ -504,6 +508,13 @@ class LatexToDragDrop(object):
             m = re.search('FORMULA_ERR: (.*)', k)
             if m:
                 self.dnd_formula['err'] = m.group(1)
+            m = re.search('OPTIONS: (.*)', k)
+            if m:
+                options = m.group(1).split()
+                if 'CAN_REUSE' in options:
+                    self.options['can_reuse'] = True
+                if 'ALLOW_EMPTY' in options:
+                    self.options['allow_empty'] = True
 
         if self.verbose:
             print "  %s target boxes" % len(self.box_answers)

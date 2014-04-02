@@ -22,6 +22,19 @@
 \pagestyle{empty}
 \usetikzlibrary{calc}
 
+\newcommand\DDoptions[1]{%
+  % #1 = options string for generating the drag-and-drop problem
+  % 
+  % The options string is a space delimited set of option flags
+  % and configuration parameters.
+  %
+  % Supported options include:
+  %
+  % CAN_REUSE : allow students to use labels more than once
+  % ALLOW_EMPTY: allow empty target boxes (useful for formula grading)
+  \addtostream{dnd}{OPTIONS: #1}%
+}  
+
 \newcommand\DDlabel[3][UseContents]{%
   % #1 = label formula symbol (for formula check grading, optional, defaults to #3)
   % #2 = label name
