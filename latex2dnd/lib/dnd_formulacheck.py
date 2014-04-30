@@ -67,10 +67,10 @@ def dnd_check_formula(expect, ans, draggable_map, target_formula, samples, optio
             msg = "<br/>Sorry, your input is incomplete "
             return {'ok': False, 'msg': msg}
 
-    if options.get('hide_formula_input', True):
-        msg = 'You have input the expression: %s' % expr
-    else:
+    if options.get('hide_formula_input', False):
         msg = ''
+    else:
+        msg = 'You have input the expression: %s' % expr
     ok = False
     try:
         ok = is_formula_equal(expect, expr, samples)
