@@ -381,7 +381,8 @@ class LatexToDragDrop(object):
                     'CHECK_SAMPLES': repr(dndf['samples']),
                     'CHECK_EXPECT': repr(dndf['expect']),
                     'CHECK_ERROR_MSG': repr(dndf['err']),
-                    'OPTION_ALLOW_EMPTY': repr(self.options.get('allow_empty', False))
+                    'OPTION_ALLOW_EMPTY': repr(self.options.get('allow_empty', False)),
+                    'OPTION_HIDE_FORMULA_INPUT': repr(self.options.get('hide_formula_input', False))
                     }
 
             for key, val in info.items():
@@ -511,10 +512,8 @@ class LatexToDragDrop(object):
             m = re.search('OPTIONS: (.*)', k)
             if m:
                 options = m.group(1).split()
-                if 'CAN_REUSE' in options:
-                    self.options['can_reuse'] = True
-                if 'ALLOW_EMPTY' in options:
-                    self.options['allow_empty'] = True
+                for option in options:
+                    self.options[option.lower().strip()] = True
 
         if self.verbose:
             print "  %s target boxes" % len(self.box_answers)

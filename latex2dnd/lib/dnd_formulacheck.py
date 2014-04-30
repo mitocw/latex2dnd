@@ -67,7 +67,10 @@ def dnd_check_formula(expect, ans, draggable_map, target_formula, samples, optio
             msg = "<br/>Sorry, your input is incomplete "
             return {'ok': False, 'msg': msg}
 
-    msg = 'You have input the expression: %s' % expr
+    if options.get('hide_formula_input', True):
+        msg = 'You have input the expression: %s' % expr
+    else:
+        msg = ''
     ok = False
     try:
         ok = is_formula_equal(expect, expr, samples)
@@ -88,6 +91,7 @@ def CHECK_FUNCTION(expect, ans, dcf=dnd_check_formula):
     expect = CHECK_EXPECT
     options = {'allow_empty': OPTION_ALLOW_EMPTY,
                'err_msg': CHECK_ERROR_MSG,
+               'hide_formula_input': OPTION_HIDE_FORMULA_INPUT,
     }
 
     # call dnd_check_formula to do mapping from dnd to formual and to test expression

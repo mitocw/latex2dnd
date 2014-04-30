@@ -163,3 +163,5 @@ History
 *     .2: improved box alignment and pixel position computation
 *     .3: center labels in boxes; custom code when can_reuse=true
 *     .4: add formula grading and gravity.tex example
+*     .5: add \DDoptions{HIDE_FORMULA_INPUT} handling to not display formula input
+
