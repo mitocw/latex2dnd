@@ -252,7 +252,7 @@ class LatexToDragDrop(object):
     '''
     
     def __init__(self, texfn, compile=True, verbose=True, dpi=300, imverbose=False, outdir='.',
-                 can_reuse=False):
+                 can_reuse=False, custom_cfn=None):
         '''
         texfn = *.tex filename
         '''
@@ -283,6 +283,7 @@ class LatexToDragDrop(object):
         self.verbose = verbose
         self.imverbose = imverbose
         self.options['can_reuse'] = can_reuse
+        self.options['custom_cfn'] = custom_cfn
         self.texfn = texfn
         self.fnpre = path(texfn[:-4])
         self.pdffn = self.fnpre + '.pdf'
@@ -350,12 +351,23 @@ class LatexToDragDrop(object):
             # anskey is a list of {draggable_id : target_id}
             anskey.append({aname: tname})
 
-        # if self.dnd_formula is not {}, then use a formula for checking, 
-        # with customresponse script code, instead of the default
-        # dnd grader.
-
-        if self.dnd_formula:
             
+        if self.options.get('custom_cfn', None) is not None:
+
+            # if custom_cfn is defined (either on command line, or in \DDoptions,
+            # then use the named check function to evaluate DND output
+            
+            cfn = self.options['custom_cfn']
+            cr.set('cfn', cfn)
+            if self.verbose:
+                print "    Using custom check function '%s' to evaluate DND output" % cfn
+                
+        elif self.dnd_formula:
+            
+            # if self.dnd_formula is not {}, then use a formula for checking, 
+            # with customresponse script code, instead of the default
+            # dnd grader.
+
             cfn = 'check_%s' % self.fnpre.basename()
             cr.set('cfn', cfn)
             
@@ -511,9 +523,21 @@ class LatexToDragDrop(object):
                 self.dnd_formula['err'] = m.group(1)
             m = re.search('OPTIONS: (.*)', k)
             if m:
+                # define options based on key=value pairs specified in the tex file
+                # for example, custom_cfn=my_check_function
                 options = m.group(1).split()
                 for option in options:
-                    self.options[option.lower().strip()] = True
+                    if '=' in option:
+                        (key, val) = option.split('=',1)
+                        key = key.lower().strip()
+                    else:
+                        key = option.lower().strip()
+                        val = True
+                    if self.options.get(key, None) is not None:
+                        print "  %s already fixed by command-line option: using that to override \DDoptions %s" % (key, option)
+                    else:
+                        self.options[key] = val
+                 # print "OPTIONS = ", self.options
 
         if self.verbose:
             print "  %s target boxes" % len(self.box_answers)
@@ -601,6 +625,11 @@ def CommandLine():
                       dest="resolution",
                       default="300",
                       help="Resolution of PNG files in DPI (default 300)",)
+    parser.add_option("--cfn",
+                      action="store",
+                      dest="custom_cfn",
+                      default=None,
+                      help="Name of python script check function to use for drag-drop checking",)
     (opts, args) = parser.parse_args()
 
     if len(args)<1:
@@ -614,7 +643,9 @@ def CommandLine():
                           dpi=opts.resolution,
                           outdir=opts.output_dir,
                           imverbose=opts.very_verbose,
-                          can_reuse=opts.can_reuse)
+                          can_reuse=opts.can_reuse,
+                          custom_cfn=opts.custom_cfn,
+    )
 
 if __name__=="__main__":
     CommandLine()
