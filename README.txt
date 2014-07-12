@@ -164,4 +164,4 @@ History
 *     .3: center labels in boxes; custom code when can_reuse=true
 *     .4: add formula grading and gravity.tex example
 *     .5: add \DDoptions{HIDE_FORMULA_INPUT} handling to not display formula input
-
+*     .6: add \DDoptins{CUSTOM_CFN=xxx} and --cfn=xxx command line for custom DND result check function

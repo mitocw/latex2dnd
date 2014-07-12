@@ -15,7 +15,7 @@ data_files = [
 
 setup(
     name='latex2dnd',
-    version='0.9.5',
+    version='0.9.6',
     author='I. Chuang',
     author_email='ichuang@mit.edu',
     packages=['latex2dnd', 'latex2dnd.test'],
