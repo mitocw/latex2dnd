@@ -379,6 +379,7 @@ class LatexToDragDrop(object):
             # dnd grader.
 
             cfn = 'check_%s' % self.fnpre.basename()
+            cfn = cfn.replace('-', '_')		# cfn must be a legal python procedure name
             cr.set('cfn', cfn)
             
             script = etree.SubElement(xml, 'script')
@@ -397,6 +398,16 @@ class LatexToDragDrop(object):
                 dmap[lname] = lsym
 
             dndf = self.dnd_formula
+
+            # do some error checking here - validate samples string
+            m = re.search('([^@]+)@([^:]+):([^\#]+)#(\d+)', repr(dndf['samples']))
+            if not m:
+                print "WARNING!!! Incorrect \DDforumla samples expression?  you have:"
+                print "  formula = %s" % dndf['formula']
+                print "  samples = %s" % dndf['samples']
+                print "  expect  = %s" % dndf['expect']
+
+
             info = {'CHECK_FUNCTION': cfn,
                     'CHECK_DMAP': repr(dmap),
                     'CHECK_FORMULA': repr(dndf['formula']),
