@@ -57,9 +57,19 @@ class PageImage(object):
         cmd = 'pdfcrop --verbose tmp.pdf %s' % (pdfimfn)
         if verbose:
             print cmd
-        bbstr = os.popen(cmd).read()
+        try:
+            bbstr = os.popen(cmd).read()
+        except Exception as err:
+            print "===> [latex2dnd] error running pdfcrop, command: %s" % cmd
+            print "Error: ", err
+            raise
 
-        hrbb_str = re.findall('HiResBoundingBox:([^\n]+)', bbstr)[0].split()
+        try:
+            hrbb_str = re.findall('HiResBoundingBox:([^\n]+)', bbstr)[0].split()
+        except Exception as err:
+            print "===> [latex2dnd] error finding high resolution bounding boxes in output from command: %s" % cmd
+            print "Error: ", err
+            raise
 
 	# turn bounding box into units of inches
         def pt2in(x):
