@@ -25,7 +25,10 @@ import sys
 import re
 import json
 import optparse
-from path import path
+try:
+    from path import path
+except:
+    from path import Path as path
 from lxml import etree
 from collections import OrderedDict
 
