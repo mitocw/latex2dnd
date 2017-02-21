@@ -155,6 +155,17 @@ Note that more labels are defined than just the correct ones.  This is the XML g
       </solution>
     </span>
 
+Notes
+=====
+
+latex2dnd uses the "-region" feature of imagemagick's convert command,
+to white out solution boxes and generate the problem image.  Version
+7.0.4 of imagemagick appears to have a bug in how it handles
+"-region", causing the region specification to be ignored, and thus
+producing blank problem images (everything whited out).  If you
+encounter this problem, one workaround is to back out to version 6.9.1
+of imagemagick.
+
 History
 =======
 
