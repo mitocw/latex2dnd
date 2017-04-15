@@ -5,11 +5,20 @@ from calc import evaluator
 import json
 
 def is_formula_equal(expected, given, samples, cs=True, tolerance=0.01):
-    variables = samples.split('@')[0].split(',')
-    numsamples = int(samples.split('@')[1].split('#')[1])
-    sranges = zip(*map(lambda x: map(float, x.split(",")),
-                       samples.split('@')[1].split('#')[0].split(':')))
-    ranges = dict(zip(variables, sranges))
+    try:
+        variables = samples.split('@')[0].split(',')
+        sranges = zip(*map(lambda x: map(float, x.split(",")),
+                           samples.split('@')[1].split('#')[0].split(':')))
+        ranges = dict(zip(variables, sranges))
+    except Exception as err:
+        raise Exception("is_formula_eq: failed to evaluate samples expression '%s', err=%s" % (samples, str(err)))
+    try:
+        numsamples = int(samples.split('@')[1].split('#')[1])
+    except Exception as err:
+        raise Exception("is_formula_eq: failed to evaluate samples expression '%s', bad specification of number of samples, err=%s" % (samples, str(err)))
+    if not len(variables)==len(sranges):
+        raise Exception("is_formula_eq: bad samples expression '%s', # variables = %s, but # ranges = %s" % (samples, len(variables), len(sranges)))
+
     for i in range(numsamples):
         vvariables = {}
         for var in ranges:
@@ -17,9 +26,12 @@ def is_formula_equal(expected, given, samples, cs=True, tolerance=0.01):
             vvariables[str(var)] = value
         try:
             instructor_result = evaluator(vvariables, dict(), expected, case_sensitive=cs)
+        except Exception as err:
+            raise Exception("is_formula_eq: failed to evaluate expected instructor result, formula='%s', vvariables=%s, err=%s" % (expected, vvariables, str(err)))
+        try:
             student_result = evaluator(vvariables, dict(), given, case_sensitive=cs)
         except Exception as err:
-            raise Exception("is_formula_eq: vvariables=%s, err=%s" % (vvariables, str(err)))
+            raise Exception("is_formula_eq: failed to evaluate student result entry, formula='%s', vvariables=%s, err=%s" % (given, vvariables, str(err)))
         if abs(instructor_result-student_result) > tolerance:
             return False
     return True

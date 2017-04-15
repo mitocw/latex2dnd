@@ -3,7 +3,10 @@ import contextlib
 import unittest
 import tempfile
 import shutil
-from path import path	# needs path.py
+try:
+    from path import path
+except:
+    from path import Path as path
 import latex2dnd as l2dndmod
 from latex2dnd.main import LatexToDragDrop
 from StringIO import StringIO

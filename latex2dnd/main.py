@@ -31,6 +31,7 @@ except:
     from path import Path as path
 from lxml import etree
 from collections import OrderedDict
+from formula import FormulaTester
 
 class PageImage(object):
     '''
@@ -426,6 +427,9 @@ class LatexToDragDrop(object):
             script.text = '\n' + check_code
             if self.verbose:
                 print script.text
+
+            fut = FormulaTester(check_code, self.box_answers)
+            fut.run_tests()
 
         else:
 
