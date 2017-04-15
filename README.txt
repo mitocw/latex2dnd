@@ -155,6 +155,22 @@ Note that more labels are defined than just the correct ones.  This is the XML g
       </solution>
     </span>
 
+Advanced usage
+==============
+
+Here are some additional useful macros:
+
+\DDoptions{} -- extra configuration parameters, e.g. HIDE_FORMULA_INPUT, CAN_REUSE, and ALLOW_EMPTY
+
+\DDformula{ pattern }{ samples }{ expected } -- use formula checking to test correctness of drag-and-drop response.  For example:
+
+    \DDformula{ [1] * [2] * [3] / [4] }{ G,m_1,m_2,d@1,1,1,1:20,20,20,20\#40 }{G*m_1*m_2/d^2}{}
+
+\DDtest{ correct | incorrect }{ answer_box_ids }{ draggable_ids } -- unit test to perform on DDformula expressions, e.g.
+
+    \DDtest{correct}{1,2,3,4}{G,m2,m1,d2}
+    \DDtest{incorrect}{1,2,3,4}{G,d2,m1,m2}
+
 Notes
 =====
 
@@ -176,3 +192,4 @@ History
 *     .4: add formula grading and gravity.tex example
 *     .5: add \DDoptions{HIDE_FORMULA_INPUT} handling to not display formula input
 *     .6: add \DDoptins{CUSTOM_CFN=xxx} and --cfn=xxx command line for custom DND result check function
+* v1.0.0: add unt tests for DDformula

@@ -64,6 +64,13 @@
   \addtostream{dnd}{FORMULA_ERR: #4}%
 }%
 
+\newcommand\DDtest[3]{%
+  % #1 = correct or incorrect
+  % #2 = list of comma separated target ID's (answer boxes)
+  % #3 = list of comma separated draggable ID's (answer label IDs)
+  \addtostream{dnd}{TEST: #1 /// #2 /// #3}%
+}%
+
 \newcommand{\writeDDlabels}[1][4.3ex]{
   % write out drag-drop labels
   % arguments:

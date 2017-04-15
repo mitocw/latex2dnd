@@ -30,6 +30,8 @@ class TestGravityWithOptions(unittest.TestCase):
             os.chdir(tmdir)
             l2dnd = LatexToDragDrop(nfn, verbose=True)
 
+            self.assertTrue(len(l2dnd.test_results)==3)
+
             pre = nfn[:-4]
             auxfn = pre + ".aux"
             self.assertTrue(os.path.exists(auxfn))

@@ -1,6 +1,6 @@
 % 
 % example file for latex2dnd
-% this version uses formula checking
+% this version has error
 %
 
 \documentclass{article}
@@ -11,7 +11,7 @@
 
 \begin{document}
 
-\DDoptions{ALLOW_EMPTY HIDE_FORMULA_INPUT}
+% \DDoptions{ALLOW_EMPTY HIDE_FORMULA_INPUT CUSTOM_CFN=mytest}
 
 % define drag-drop labels
 
@@ -29,10 +29,9 @@ $$F = \frac{\DDB{1}{G} \DDB{2}{m1}\DDB{3}{m2}}{\DDB{4}{d2}}$$
 
 % the formula to use for correctness checking, the samples, the expected answer, and the error message
 % place target_id names inside square brackets
-\DDformula{ [1] * [2] * [3] / [4] }{ G,m_1,m_2,d@1,1,1,1:20,20,20,20\#40 }{G*m_1*m_2/d^2}{}
 
-\DDtest{correct}{1,2,3,4}{G,m2,m1,d2}
-\DDtest{incorrect}{1,2,3,4}{G,d2,m1,m2}
+% expected corect result is badly formatted
+\DDformula{ [1] * [2] * [3] / [4] }{ G,m_1,m_2,d@1,1,1,1:20,20,20,20\#40 }{G*m_1*m_2/d^2 + (}{}
 
 % output labels, with fixed box heights
 \writeDDlabels[4.3ex]

@@ -428,8 +428,8 @@ class LatexToDragDrop(object):
             if self.verbose:
                 print script.text
 
-            fut = FormulaTester(check_code, self.box_answers)
-            fut.run_tests()
+            fut = FormulaTester(check_code, self.box_answers, self.unit_tests)
+            self.test_results = fut.run_tests()
 
         else:
 
@@ -512,6 +512,7 @@ class LatexToDragDrop(object):
         self.dnd_label_contents = OrderedDict()
         self.box_answers = OrderedDict()
         self.dnd_formula = {}
+        self.unit_tests = []
 
         dndfn = self.fnpre + '.dnd'
 
@@ -532,6 +533,23 @@ class LatexToDragDrop(object):
                 # 1 = box name
                 # 2 = answer label name
                 self.box_answers[m.group(1)] = m.group(2)
+            m = re.search('TEST: ([^/]+) /// ([^/]+) /// ([^/]+)', k)		# unit test specifications
+            if m:
+                # 1 = correct or incorrect
+                # 2 = list of comma separated target ID's (answer box numbers)
+                # 3 = list of comma separated draggable ID's (answer label IDs)
+                etype = m.group(1).lower()
+                assert etype=="correct" or etype=="incorrect"
+                target_ids = m.group(2).strip().split(',')
+                draggable_ids = m.group(3).strip().split(',')
+                if not len(target_ids)==len(draggable_ids):
+                    print "--> Error in DDtest: mismatch in length of target IDs and draggable IDs in '%s'" % k
+                    sys.exit(0)
+                target_assignments = dict(zip(target_ids, draggable_ids))
+                self.unit_tests.append({'etype': etype, 'target_assignments': target_assignments})
+                if self.verbose:
+                    print "Added unit test [%s] = %s" % (len(self.unit_tests), self.unit_tests[-1])
+
             m = re.search('FORMULA: (.*)', k)
             if m:
                 #1 = formula to use in checking
