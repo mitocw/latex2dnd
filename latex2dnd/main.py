@@ -294,6 +294,7 @@ class LatexToDragDrop(object):
             return
 
         self.options = {}
+        self.test_results = {}
         self.verbose = verbose
         self.imverbose = imverbose
         self.options['can_reuse'] = can_reuse
@@ -430,6 +431,11 @@ class LatexToDragDrop(object):
 
             fut = FormulaTester(check_code, self.box_answers, self.unit_tests)
             self.test_results = fut.run_tests()
+            tfn = self.fnpre + '_dnd_tests.json'
+            with open(tfn,'w') as fp:
+                fp.write(json.dumps(self.test_results, indent=4))
+            if self.verbose:
+                print "Wrote unit test results to %s" % tfn
 
         else:
 

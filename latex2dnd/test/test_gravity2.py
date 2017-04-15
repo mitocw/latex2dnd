@@ -44,5 +44,8 @@ class TestGravityWithOptions(unittest.TestCase):
             xml = open(xfn).read()
             self.assertIn("'hide_formula_input': True", xml)
 
+            tfn = path(tmdir) / 'gravity2_dnd_tests.json'
+            self.assertTrue(os.path.exists(tfn))
+
 if __name__ == '__main__':
     unittest.main()
