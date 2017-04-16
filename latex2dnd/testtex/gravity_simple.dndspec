@@ -1,0 +1,8 @@
+MATCH_LABELS: G,m_1,m_2,R
+BEGIN_EXPRESSION
+\bea
+	\frac{ G m_1 m_2 }{ R }
+\nonumber
+\eea
+END_EXPRESSION
+CHECK_FORMULA: G * m_1 * m_2 / R

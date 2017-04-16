@@ -1,0 +1,87 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% DND tex file generated from <FILENAME>
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+\usepackage{amsmath}
+\input{latex2dnd}
+
+\def\lbL{\lb\rule{0pt}{2.4ex}}
+\def\lpL{\left(\rule{0pt}{2.4ex}}
+\def\lb{\left[}         \def\rb{\right]}
+\def\lp{\left(}         \def\rp{\right)}
+\def\rar{\rightarrow}
+\def\del{\nabla}
+\def\w{\omegaup}
+\def\ket#1{\left\vert #1 \right\rangle}
+\def\bra#1{\left\langle #1 \right\vert}
+\def\M#1#2{M_{#1}( #2) }
+\def\R#1#2{R_{#1}( #2 ) }
+\def\adag{a^\dagger}
+\def\bdag{b^\dagger}
+\def\Bdag{B^\dagger}
+
+\def\bea{\begin{eqnarray}}
+\def\eea{\end{eqnarray}}
+\def\ben{\begin{eqnarray*}}
+\def\een{\end{eqnarray*}}
+
+\def\non{\nonumber}
+
+\def\>{\rangle}
+\def\<{\langle}
+\def\l{\left}
+\def\r{\right}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% OPTIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \DDoptions{ALLOW_EMPTY}
+\DDoptions{HIDE_FORMULA_INPUT}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% define drag-drop labels
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<LABELS>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% shorthand macro to make boxes the same size
+%
+% edit these if boxes too small
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand\DDB[2]{\DDbox{#1}{8ex}{4ex}{#2}}
+\newcommand\DDBB[2]{\DDbox{#1}{10ex}{6ex}{#2}}
+\newcommand\DDBBB[2]{\DDbox{#1}{12ex}{6ex}{#2}}
+\newcommand\DDBBBB[2]{\DDbox{#1}{14ex}{6ex}{#2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% original expression, for reference
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<COMMENTED_EXPRESSION>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dnd expression with boxes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<EXPRESSION>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dnd check formula
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<DD_FORMULA>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% output labels, with fixed box heights
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\writeDDlabels[4.3ex]
+
+\end{document}
+

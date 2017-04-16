@@ -32,6 +32,7 @@ except:
 from lxml import etree
 from collections import OrderedDict
 from formula import FormulaTester
+from dndspec import DNDspec2tex
 
 class PageImage(object):
     '''
@@ -638,9 +639,12 @@ class LatexToDragDrop(object):
         self.BoxSet = BoxSet
 
 
-def CommandLine():
-    parser = optparse.OptionParser(usage="usage: %prog [options] filename.tex",
-                                   version="%prog 0.9")
+def CommandLine(opts=None, args=None, arglist=None):
+    '''
+    Main command line.  Accepts args, to allow for simple unit testing.
+    '''
+    parser = optparse.OptionParser(usage="usage: %prog [options] [filename.tex | filename.dndspec]",
+                                   version="%prog 1.1")
     parser.add_option('-v', '--verbose', 
                       dest='verbose', 
                       default=False, action='store_true',
@@ -682,12 +686,25 @@ def CommandLine():
                       dest="custom_cfn",
                       default=None,
                       help="Name of python script check function to use for drag-drop checking",)
-    (opts, args) = parser.parse_args()
+    parser.add_option("--output-tex",
+                      action="store_true",
+                      dest="output_tex",
+                      default=False,
+                      help="Final output should be a tex file (works when input is a *.dndspec file)",)
+
+    if not opts:
+        (opts, args) = parser.parse_args(arglist)
 
     if len(args)<1:
         parser.error('wrong number of arguments')
         sys.exit(0)
     fn = args[0]
+
+    if fn.endswith(".dndspec"):
+        s2t = DNDspec2tex(fn, output_tex=opts.output_tex, verbose=opts.verbose)
+        if opts.output_tex:
+            sys.exit(0)
+        fn = s2t.tex_filename
 
     l2d = LatexToDragDrop(fn, 
                           compile=(not opts.skip_latex), 
@@ -698,6 +715,7 @@ def CommandLine():
                           can_reuse=opts.can_reuse,
                           custom_cfn=opts.custom_cfn,
     )
+    return l2d
 
 if __name__=="__main__":
     CommandLine()
