@@ -29,7 +29,7 @@ class TestDNDspec(unittest.TestCase):
             os.system('cp %s/* %s' % (testdir, tmdir))
             os.chdir(tmdir)
             # l2dnd = LatexToDragDrop(nfn, verbose=True)
-            l2d = CommandLine(arglist=["-v", nfn])
+            l2d = CommandLine(arglist=["-v", nfn], return_object=True)
 
             pre = nfn.rsplit('.', 1)[0]
             auxfn = pre + ".aux"

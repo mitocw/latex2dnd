@@ -639,7 +639,7 @@ class LatexToDragDrop(object):
         self.BoxSet = BoxSet
 
 
-def CommandLine(opts=None, args=None, arglist=None):
+def CommandLine(opts=None, args=None, arglist=None, return_object=False):
     '''
     Main command line.  Accepts args, to allow for simple unit testing.
     '''
@@ -715,7 +715,8 @@ def CommandLine(opts=None, args=None, arglist=None):
                           can_reuse=opts.can_reuse,
                           custom_cfn=opts.custom_cfn,
     )
-    return l2d
+    if return_object:
+        return l2d
 
 if __name__=="__main__":
     CommandLine()
