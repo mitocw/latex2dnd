@@ -696,7 +696,7 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
                       action="store",
                       dest="resolution",
                       default="300",
-                      help="Resolution of PNG files in DPI (default 300)",)
+                      help="Resolution of PNG files in DPI (default 300), can set to 'max' to auto-scale",)
     parser.add_option("--cfn",
                       action="store",
                       dest="custom_cfn",
