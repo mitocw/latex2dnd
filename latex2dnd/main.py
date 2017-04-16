@@ -294,6 +294,7 @@ class LatexToDragDrop(object):
             print "Error: output directory '%s' is not a directory" % outdir
             return
 
+        self.max_image_width = 780
         self.options = {}
         self.test_results = {}
         self.verbose = verbose
@@ -326,6 +327,7 @@ class LatexToDragDrop(object):
             for label, lfn in self.labels.items():
                 print "        %s -- label '%s'" % (lfn, label)
             print 
+            print "The DND image has size %s x %s (used DPI=%s)" % (self.dndpi.sizex, self.dndpi.sizey, self.final_dpi)
             print "The XML expects images to be in %s" % self.imdir
             print "="*70
 
@@ -478,7 +480,21 @@ class LatexToDragDrop(object):
         The image from latex has solutions in it.  We white-out the
         boxes to make the dnd image.
         '''
-        self.dndpi = PageImage(self.pdffn, page=1, imfn=self.solimfn, dpi=self.dpi, verbose=self.imverbose)
+        self.final_dpi = self.dpi
+        if self.dpi=="max":
+            # automatically set DPI by limiting image width to max_image_width
+            self.final_dpi = 300
+            self.dndpi = PageImage(self.pdffn, page=1, imfn=self.solimfn, dpi=self.final_dpi, verbose=self.imverbose)            
+            if self.dndpi.sizex > self.max_image_width:
+                print "[latex2dnd] Page width %d exceeds max=%s at dpi=%s" % (self.dndpi.sizex, self.max_image_width, self.final_dpi)
+                newdpi = int(self.final_dpi * 1.0 * self.max_image_width / self.dndpi.sizex * 0.95)
+                print "            Reducing dpi to %s" % newdpi
+                self.final_dpi = newdpi
+                self.dndpi = PageImage(self.pdffn, page=1, imfn=self.solimfn, dpi=self.final_dpi, verbose=self.imverbose)            
+                if self.dndpi.sizex > self.max_image_width:
+                    print "[latex2dnd] Page width %d STILL exceeds max=%s at dpi=%s" % (self.dndpi.sizex, self.max_image_width, self.final_dpi)
+            
+        self.dndpi = PageImage(self.pdffn, page=1, imfn=self.solimfn, dpi=self.final_dpi, verbose=self.imverbose)
         # old test
         #self.dndpi.NegateBox(self.BoxSet['box1'], outfn='test.png')
         self.dndpi.WhiteBox([ self.BoxSet['box'+n] for n in self.box_answers], outfn=self.dndimfn)
@@ -487,7 +503,7 @@ class LatexToDragDrop(object):
         outdir = path(outdir)
         # page with all labels
         self.labelimfn = outdir / self.fnpre + "_labels.png"	
-        labelpi = PageImage(self.pdffn, page=2, imfn=self.labelimfn, dpi=self.dpi, verbose=self.imverbose)
+        labelpi = PageImage(self.pdffn, page=2, imfn=self.labelimfn, dpi=self.final_dpi, verbose=self.imverbose)
 
         self.labels = OrderedDict()
         
