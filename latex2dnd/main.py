@@ -644,7 +644,7 @@ def CommandLine(opts=None, args=None, arglist=None):
     Main command line.  Accepts args, to allow for simple unit testing.
     '''
     parser = optparse.OptionParser(usage="usage: %prog [options] [filename.tex | filename.dndspec]",
-                                   version="%prog 1.1")
+                                   version="%prog 1.1.0")
     parser.add_option('-v', '--verbose', 
                       dest='verbose', 
                       default=False, action='store_true',

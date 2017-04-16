@@ -155,6 +155,66 @@ Note that more labels are defined than just the correct ones.  This is the XML g
       </solution>
     </span>
 
+Simplified DND Specification
+============================
+
+LaTeX is powerful, but can be fragile.  A simpler way to write DND
+problems is to use a "dndspec" specification file; this provides a
+simple plain-text based representation of a DND problem.
+
+Example:
+
+    MATCH_LABELS: G,m_1,m_2,R
+    BEGIN_EXPRESSION
+    \bea
+    	\frac{ G m_1 m_2 }{ R }
+    \nonumber
+    \eea
+    END_EXPRESSION
+    CHECK_FORMULA: G * m_1 * m_2 / R
+
+This input.dndspec file describes a DND problem with the labels
+
+    \DDlabel[G]{G}{$G$}
+    \DDlabel[m1]{mone}{$m_1$}
+    \DDlabel[m2]{mtwo}{$m_2$}
+    \DDlabel[R]{R}{$R$}
+
+the DND expression (with boxes):
+
+    \bea
+    	\frac{ \DDB{1}{G} \DDB{2}{mone} \DDB{3}{mtwo} }{ \DDB{4}{R} }
+    \nonumber
+    \eea
+
+where this tex macro is automatically defined for the box:
+
+    \newcommand\DDB[2]{\DDbox{#1}{8ex}{4ex}{#2}}
+
+and this check formula:
+
+    \DDformula{  ([1]) * ([2]) * ([3]) / ([4])  }{ G,m1,m2,R@1,1,1,1:20,20,20,20\#20 }{  G * m1 * m2 / R  }{}
+
+Compile this using
+
+    latex2dnd -v input.dndspec
+
+and you'll get input.tex as the DND latex file (which can be edited
+for futher customizations), together with all the usual output of latex2dnd.
+
+More formally:
+
+    MATCH_LABELS: <comma separated list of labels appearing in EXPRESSION which should be made into boxes>
+    DISTRACTOR_LABELS: <comma separated list of labels to be shown as draggables>
+    ALL_LABELS: <comma separated list of MATCH and DISTRACTOR labels, in desired order, to be shown as draggables>
+    BEGIN_EXPRESSION
+          <latex expression containing MATCH labels>
+    END_EXPRESSION
+    CHECK_FORMULA: <text representation of correct formula, using MATCH labels, to be used for checking>
+    CHECK_FORMULA_BOXES: <formula using [#], where [#] is the MATCH label number; needed if MATCH labels appear in more than one input box>
+
+There should be no leading spaces / indentation on lines with keywords (like MATCH_LABELS).
+
 Advanced usage
 ==============
 
@@ -193,3 +253,4 @@ History
 *     .5: add \DDoptions{HIDE_FORMULA_INPUT} handling to not display formula input
 *     .6: add \DDoptins{CUSTOM_CFN=xxx} and --cfn=xxx command line for custom DND result check function
 * v1.0.0: add unit tests for DDformula, which automatically verify expected response is checked properly
+* v1.1.0: implement dndspec, a simplified DND problem specification language
