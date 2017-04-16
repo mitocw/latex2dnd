@@ -78,7 +78,7 @@ class DNDlabel(object):
         if m:
             self.math_variable = None
             return
-        m = re.match('([a-zA-Z]+)\^([0-9]+)', self.math_exp)
+        m = re.match('([a-zA-Z]+[0-9]*)\^([0-9]+)', self.math_exp)
         if m:
             self.math_variable = m.group(1)
             return
@@ -110,12 +110,17 @@ class DNDlabel(object):
             return tex
         expr = ""
         idx = 0
+        replp = {'+': 'plus',
+                 '-': 'minus',
+                 }
         while idx < len(tex):
             c = tex[idx]
             if c in string.letters or c in string.digits:
                 expr += c
             elif c=='^' and (idx+1 < len(tex)) and (tex[idx+1] in string.digits):
                 expr += c
+            elif c in replp:
+                expr += replp[c]
             else:
                 expr += ""
             idx += 1
@@ -130,11 +135,16 @@ class DNDlabel(object):
             return tex
         expr = ""
         digit_names = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+        replp = {'+': 'plus',
+                 '-': 'minus',
+                 }
         for c in tex:
             if c in string.letters:
                 expr += c
             elif c in string.digits:
                 expr += digit_names[int(c)]
+            elif c in replp:
+                expr += replp[c]
             else:
                 expr += ""
         if expr.startswith("_"):
@@ -185,6 +195,7 @@ class DNDspec2tex(object):
         self.match_labels = None
         self.distractor_labels = []
         self.all_labels = []
+        self.box_width = "8ex"
         self.expression = ""
         self.check_formula = None
         self.check_formula_boxes = None
@@ -208,6 +219,10 @@ class DNDspec2tex(object):
                 self.comments += "%" + k[1:]
                 continue
             if len(k.strip())==0:	# skip empty lines
+                continue
+            m = re.match('^BOX_WIDTH:(.*)', k)
+            if m:
+                self.box_width = m.group(1).strip()
                 continue
             m = re.match('^MATCH_LABELS:(.*)', k)
             if m:
@@ -294,6 +309,8 @@ class DNDspec2tex(object):
         for label in self.match_labels:
             lobj = self.label_objs[label]
             labre = "\s%s\s" % label.replace('\\', '\\\\').replace('{', '\{').replace('^', '\^')
+            labre = labre.replace('(', '\(').replace(')', '\)')
+            labre = labre.replace('+', '\+')
             matches = re.findall(labre, dnd_expression, flags=re.M)
             if not matches:
                 print "--> [dndspec] WARNING: no matching label '%s' found in expression!" % label
@@ -310,7 +327,9 @@ class DNDspec2tex(object):
                 def make_ddbox(m):
                     return lobj.make_ddbox(nwidth=1)
                 dnd_expression = re.sub(labre, make_ddbox, dnd_expression, count=1, flags=re.M)
-            self.dnd_expression = dnd_expression
+        self.dnd_expression = dnd_expression
+        if self.verbose:
+            print "[dndspec] dnd_expression=%s" % self.dnd_expression
 
     def formula_to_boxed(self, formula, labelset=None, exit_on_failure=True, missing_ok=False):
         '''
@@ -319,7 +338,8 @@ class DNDspec2tex(object):
         labelset = labelset or self.match_labels
         for label in labelset:
             lobj = self.label_objs[label]
-            labre = "\s%s\s" % lobj.math_exp.replace('^', '\^')
+            labre = "\s%s\s" % lobj.math_exp.replace('^', '\^').replace('(', '\(').replace(')', '\)')
+            labre = labre.replace('+', '\+')
             (formula, nmatch) = re.subn(labre, lobj.formula_box, formula)
             if not nmatch and (not missing_ok):
                 msg = "--> [dndspec] WARNING: no matching math expression found for '%s' (%s) in formula" % (label, lobj.math_exp)
@@ -382,6 +402,10 @@ class DNDspec2tex(object):
         uses \DDtest{correct|incorrect}{target_box_indexes}{draggable_label_names}
         '''
         test_tex = []
+        if not self.check_formula:
+            self.formula_test_tex = ""
+            return
+
         check_formula_box_id_list = self.extract_boxes_from_formula(self.check_formula_boxes)
         for test in self.formula_tests:
             try:
@@ -419,6 +443,7 @@ class DNDspec2tex(object):
                   'DD_FORMULA': self.dd_formula,
                   'COMMENTS': self.comments,
                   'DD_FORMULA_TESTS': self.formula_test_tex,
+                  'BOX_WIDTH': self.box_width,
                   }
         for key, val in params.items():
             template = template.replace('<' + key + '>', val)
