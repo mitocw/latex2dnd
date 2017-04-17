@@ -5,3 +5,5 @@
 *     .4: add formula grading and gravity.tex example
 *     .5: add \DDoptions{HIDE_FORMULA_INPUT} handling to not display formula input
 *     .6: add \DDoptins{CUSTOM_CFN=xxx} and --cfn=xxx command line for custom DND result check function
+* v1.0.0: add unit tests for DDformula, which automatically verify expected response is checked properly
+* v1.1.0: implement dndspec, a simplified DND problem specification language
