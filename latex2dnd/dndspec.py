@@ -246,7 +246,9 @@ class DNDspec2tex(object):
                          'TEST_INCORRECT': {'field': 'formula_tests', 'func': make_test_incorrect, 'append': True},
         }
 
+        cnt = 0
         for k in lines:
+            cnt += 1
             if mode=="in_expression":
                 if k.startswith("END_EXPRESSION"):
                     mode = None
@@ -262,6 +264,7 @@ class DNDspec2tex(object):
             if len(k.strip())==0:	# skip empty lines
                 continue
 
+            kwfound = False
             for kw, kwinfo in keyword_table.items():
                 m = re.match('^%s:(.*)' % kw, k)
                 if m:
@@ -273,7 +276,13 @@ class DNDspec2tex(object):
                         setattr(self, kwinfo['field'], getattr(self, kwinfo['field']) + val)
                     else:
                         setattr(self, kwinfo['field'], val)
+                    kwfound = True
                     break
+
+            if not kwfound:
+                msg = "[dndspec]: Cannot interpret line %d: %s" % (cnt, k)
+                print msg
+                raise Exception(msg)
 
         if self.verbose:
             print "[dndspec] from file %s read %d match labels, %d labels alltogether, and %d tests" % (sfn,
