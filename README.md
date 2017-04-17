@@ -20,6 +20,7 @@ A working latex installation is also required.
 Usage
 -----
 
+```
 Usage: latex2dnd [options] [filename.tex | filename.dndspec]
 
 Options:
@@ -46,6 +47,7 @@ Options:
                         a *.dndspec file)
   --cleanup             Remove old solution image files, and tmp.pdf
   --nonrandom           Do not use a random string in the solution filename
+```
 
 Example
 -------
@@ -104,35 +106,38 @@ latex2dnd works by introducing three important new macros:
 Here is an example, giving the LaTeX code for a drag-and-drop question asking for the
 quadratic equation roots formula to be filled in:
 
-    \documentclass{article}
-    \input{latex2dnd}
-    
-    \begin{document}
-    
-    % define drag-drop labels
-    \DDlabel{term1}{$-b$}
-    \DDlabel{term1p}{$+b$}
-    \DDlabel{term2}{$b^2$}
-    \DDlabel{dubexp}{$b^{2^\alpha}$}
-    \DDlabel{dubsub}{$b_{2_\alpha}$}
-    \DDlabel{fac}{$-4ac$}
-    \DDlabel{facp}{$+4ac$}
-    \DDlabel{ta}{$+2a$}
-    \DDlabel{tam}{$-2a$}
-    
-    % shorthand macro to make all boxes the same size (6 by 4)
-    \newcommand\DDB[2]{\DDbox{#1}{6ex}{4ex}{#2}}
-    
-    % the formula with boxes
-    $$\lambda = \frac{\DDB{1}{term1}\pm \sqrt{\DDB{2}{term2}\DDB{3}{fac}}}{\DDB{4}{ta}}$$
-    
-    % output labels, with fixed box heights
-    \writeDDlabels[4.3ex]
-    
-    \end{document}
+```tex
+\documentclass{article}
+\input{latex2dnd}
+
+\begin{document}
+
+% define drag-drop labels
+\DDlabel{term1}{$-b$}
+\DDlabel{term1p}{$+b$}
+\DDlabel{term2}{$b^2$}
+\DDlabel{dubexp}{$b^{2^\alpha}$}
+\DDlabel{dubsub}{$b_{2_\alpha}$}
+\DDlabel{fac}{$-4ac$}
+\DDlabel{facp}{$+4ac$}
+\DDlabel{ta}{$+2a$}
+\DDlabel{tam}{$-2a$}
+
+% shorthand macro to make all boxes the same size (6 by 4)
+\newcommand\DDB[2]{\DDbox{#1}{6ex}{4ex}{#2}}
+
+% the formula with boxes
+$$\lambda = \frac{\DDB{1}{term1}\pm \sqrt{\DDB{2}{term2}\DDB{3}{fac}}}{\DDB{4}{ta}}$$
+
+% output labels, with fixed box heights
+\writeDDlabels[4.3ex]
+
+\end{document}
+```
 
 Note that more labels are defined than just the correct ones.  This is the XML generated from the above example:
 
+```xml
     <span>
       <customresponse>
        <drag_and_drop_input img="/static/images/quadratic/quadratic_dnd.png" target_outline="false" one_per_target="true" no_labels="true" label_bg_color="rgb(222, 139, 238)">
@@ -167,6 +172,7 @@ Note that more labels are defined than just the correct ones.  This is the XML g
         <img src="/static/images/quadratic/quadratic_dnd_sol.png"/>
       </solution>
     </span>
+```
 
 Simplified DND Specification
 ----------------------------
