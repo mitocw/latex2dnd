@@ -1,0 +1,26 @@
+OPTIONS: HIDE_FORMULA_INPUT
+LABEL: 1 = one /// 1
+LABEL: 2 = two /// 2
+LABEL: 3 = four /// 4
+LABEL: 4 = a /// a
+LABEL: 5 = minusa /// -a
+LABEL: 6 = b /// b
+LABEL: 7 = minusb /// -b
+LABEL: 8 = c /// c
+LABEL: 9 = atwo /// a^2
+LABEL: 10 = btwo /// b^2
+LABEL: 11 = ctwo /// c^2
+BOX: 1 = minusb
+BOX: 2 = btwo
+BOX: 3 = four
+BOX: 4 = a
+BOX: 5 = c
+BOX: 6 = two
+BOX: 12 = a
+FORMULA:  ( ([1]) + cos( ([2]) - ([3]) * ([4]) * ([5]) ) )/ ( ([6]) * ([12]) ) 
+FORMULA_SAMPLES:  a,c,b@1,1,1:20,20,20\#20 
+FORMULA_EXPECT:  ( -b + cos( b^2 - 4 * a * c ) ) / ( 2 * a ) 
+FORMULA_ERR: 
+TEST: correct /// 1,2,3,4,5,6,12 /// minusb,btwo,c,a,four,a,two
+TEST: incorrect /// 1,2,3,4,5,6,12 /// minusb,btwo,c,atwo,four,a,two
+TEST: incorrect /// 1,2,3,4,5,6,12 /// minusb,btwo,c,atwo,four,c,two

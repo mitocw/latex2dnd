@@ -1,0 +1,118 @@
+[
+    {
+        "msg": "", 
+        "test_expected_ans": [
+            {
+                "minusb": "1"
+            }, 
+            {
+                "btwo": "2"
+            }, 
+            {
+                "four": "3"
+            }, 
+            {
+                "a": "4"
+            }, 
+            {
+                "c": "5"
+            }, 
+            {
+                "two": "6"
+            }, 
+            {
+                "a": "12"
+            }
+        ], 
+        "ok": true, 
+        "test_ok": true, 
+        "test_etype": "correct"
+    }, 
+    {
+        "msg": "", 
+        "test_expected_ans": [
+            {
+                "two": "12"
+            }, 
+            {
+                "minusb": "1"
+            }, 
+            {
+                "c": "3"
+            }, 
+            {
+                "btwo": "2"
+            }, 
+            {
+                "four": "5"
+            }, 
+            {
+                "a": "4"
+            }, 
+            {
+                "a": "6"
+            }
+        ], 
+        "ok": true, 
+        "test_ok": true, 
+        "test_etype": "correct"
+    }, 
+    {
+        "msg": "<br/><font color=\"red\"></font>", 
+        "test_expected_ans": [
+            {
+                "two": "12"
+            }, 
+            {
+                "minusb": "1"
+            }, 
+            {
+                "c": "3"
+            }, 
+            {
+                "btwo": "2"
+            }, 
+            {
+                "four": "5"
+            }, 
+            {
+                "atwo": "4"
+            }, 
+            {
+                "a": "6"
+            }
+        ], 
+        "ok": false, 
+        "test_ok": true, 
+        "test_etype": "incorrect"
+    }, 
+    {
+        "msg": "<br/><font color=\"red\"></font>", 
+        "test_expected_ans": [
+            {
+                "two": "12"
+            }, 
+            {
+                "minusb": "1"
+            }, 
+            {
+                "c": "3"
+            }, 
+            {
+                "btwo": "2"
+            }, 
+            {
+                "four": "5"
+            }, 
+            {
+                "atwo": "4"
+            }, 
+            {
+                "c": "6"
+            }
+        ], 
+        "ok": false, 
+        "test_ok": true, 
+        "test_etype": "incorrect"
+    }
+]

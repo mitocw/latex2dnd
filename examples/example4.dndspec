@@ -1,0 +1,25 @@
+%
+% example4.dndspec: physics formula with checking
+%
+% This is an edX drag-and-drop problem defined using a "dndspec" file,
+% a plain-text representation which is easily edited.
+% 
+% Some properties of this specification:
+% - Note spaces around every label in the tex expression.
+% - The check formula also has spaces around each label.
+% - Labels are presented in the order specified in the ALL_LABELS line
+% - Lines starting in '%' are comments; blank lines are disregarded.
+%
+% Compile this into the *.xml and *.png files needed, using
+% latex2edx filename.dndspec
+% 
+
+MATCH_LABELS: 2, v, \mu, B^\prime
+ALL_LABELS: 1, 2, 3, B^\prime, \mu, v, v^2
+BEGIN_EXPRESSION
+\bea
+        x_0 = \sqrt{ 2 \frac{ v \hbar }{ \mu B^\prime } }
+\nonumber
+\eea
+END_EXPRESSION
+CHECK_FORMULA: 2 * v / ( mu * Bprime )

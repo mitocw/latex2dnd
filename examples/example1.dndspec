@@ -1,0 +1,25 @@
+%
+% example2.dndspec: gravity formula
+%
+% This is an edX drag-and-drop problem defined using a "dndspec" file,
+% a plain-text representation which is easily edited.
+% 
+% Some properties of this specification:
+% - Note spaces around every label in the tex expression.
+% - The check formula also has spaces around each label.
+% - Labels are presented in the order specified in the ALL_LABELS line
+% - Lines starting in '%' are comments; blank lines are disregarded.
+%
+% Compile this into the *.xml and *.png files needed, using
+% latex2edx filename.dndspec
+% 
+
+MATCH_LABELS: m_1 m_2, r
+ALL_LABELS: m_1, m_2, m_1 m_2, m_1^2 m_2, m_1^2 m_2^2, r, r^2
+
+BEGIN_EXPRESSION
+\begin{equation}
+    F = \frac{ G m_1 m_2 }{ r }
+\nonumber
+\end{equation}
+END_EXPRESSION

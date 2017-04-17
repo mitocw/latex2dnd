@@ -1,0 +1,151 @@
+<span>
+  <customresponse cfn="check_example2">
+    <drag_and_drop_input img="/static/images/example2/example2_dnd.png" target_outline="false" one_per_target="true" no_labels="true" label_bg_color="rgb(222, 139, 238)">
+      <draggable id="one" icon="/static/images/example2/example2_dnd_label1.png"/>
+      <draggable id="two" icon="/static/images/example2/example2_dnd_label2.png"/>
+      <draggable id="four" icon="/static/images/example2/example2_dnd_label3.png"/>
+      <draggable id="a" icon="/static/images/example2/example2_dnd_label4.png"/>
+      <draggable id="minusa" icon="/static/images/example2/example2_dnd_label5.png"/>
+      <draggable id="b" icon="/static/images/example2/example2_dnd_label6.png"/>
+      <draggable id="minusb" icon="/static/images/example2/example2_dnd_label7.png"/>
+      <draggable id="c" icon="/static/images/example2/example2_dnd_label8.png"/>
+      <draggable id="atwo" icon="/static/images/example2/example2_dnd_label9.png"/>
+      <draggable id="btwo" icon="/static/images/example2/example2_dnd_label10.png"/>
+      <draggable id="ctwo" icon="/static/images/example2/example2_dnd_label11.png"/>
+      <target id="1" x="82" y="17" w="95" h="67"/>
+      <!-- answer=minusb -->
+      <target id="2" x="259" y="17" w="95" h="67"/>
+      <!-- answer=btwo -->
+      <target id="3" x="406" y="17" w="95" h="67"/>
+      <!-- answer=four -->
+      <target id="4" x="520" y="17" w="95" h="67"/>
+      <!-- answer=a -->
+      <target id="5" x="633" y="17" w="95" h="67"/>
+      <!-- answer=c -->
+      <target id="6" x="301" y="116" w="95" h="67"/>
+      <!-- answer=two -->
+      <target id="12" x="414" y="116" w="96" h="67"/>
+      <!-- answer=a -->
+    </drag_and_drop_input>
+  </customresponse>
+  <script type="text/python">
+import string
+import random
+from math import *
+from calc import evaluator
+import json
+
+def is_formula_equal(expected, given, samples, cs=True, tolerance=0.01):
+    try:
+        variables = samples.split('@')[0].split(',')
+        sranges = zip(*map(lambda x: map(float, x.split(",")),
+                           samples.split('@')[1].split('#')[0].split(':')))
+        ranges = dict(zip(variables, sranges))
+    except Exception as err:
+        raise Exception("is_formula_eq: failed to evaluate samples expression '%s', err=%s" % (samples, str(err)))
+    try:
+        numsamples = int(samples.split('@')[1].split('#')[1])
+    except Exception as err:
+        raise Exception("is_formula_eq: failed to evaluate samples expression '%s', bad specification of number of samples, err=%s" % (samples, str(err)))
+    if not len(variables)==len(sranges):
+        raise Exception("is_formula_eq: bad samples expression '%s', # variables = %s, but # ranges = %s" % (samples, len(variables), len(sranges)))
+
+    for i in range(numsamples):
+        vvariables = {}
+        for var in ranges:
+            value = random.uniform(*ranges[var])
+            vvariables[str(var)] = value
+        try:
+            instructor_result = evaluator(vvariables, dict(), expected, case_sensitive=cs)
+        except Exception as err:
+            raise Exception("is_formula_eq: failed to evaluate expected instructor result, formula='%s', vvariables=%s, err=%s" % (expected, vvariables, str(err)))
+        try:
+            student_result = evaluator(vvariables, dict(), given, case_sensitive=cs)
+        except Exception as err:
+            raise Exception("is_formula_eq: failed to evaluate student result entry, formula='%s', vvariables=%s, err=%s" % (given, vvariables, str(err)))
+        if abs(instructor_result-student_result) &gt; tolerance:
+            return False
+    return True
+    
+def dnd_check_formula(expect, ans, draggable_map, target_formula, samples, options=None):
+
+    # construct symbolic expression from drag-and-drop result, given
+    # targets in numerator and denominator
+    # 
+    # draggable_map maps from draggable_id to math symbol
+    # target_formula is a format string which places target_id into a formula
+    # samples = sample string for numerical checking
+    #
+    # the code in this procedure should be independent of a specific DND problem.
+
+    anslist = json.loads(ans)
+    if options is None:
+        options = {}
+
+    target_syms = {}
+    for dnddict in anslist:
+        # each dnddict is {draggable_id : target_id}
+        (did, tid) = dnddict.items()[0]
+        try:
+            # turn target id's which are numbers into _number (so that format strings work)
+            tidnum = int(tid)
+            tid = '_' + tid
+        except:
+            pass
+        target_syms[tid] = draggable_map[did]
+
+    if options.get('allow_empty', False):
+        # dict which defaults to "1" if key missing
+        # allows empty factors in formula to be treated as the multiplicative identity
+        class SD(dict):
+            def __missing__(self, key):
+                return '1'
+        tsdict = SD()
+        tsdict.update(target_syms)
+        expr = string.Formatter().vformat(target_formula, (), tsdict)
+    else:
+        try:
+            expr = target_formula.format(**target_syms)
+        except Exception as err:
+            msg = "&lt;br/&gt;Sorry, your input is incomplete "
+            return {'ok': False, 'msg': msg}
+
+    if options.get('hide_formula_input', False):
+        msg = ''
+    else:
+        msg = 'You have input the expression: %s' % expr
+    ok = False
+    try:
+        ok = is_formula_equal(expect, expr, samples)
+    except Exception as err:
+        msg += "&lt;br/&gt;error %s" % str(err).replace('&gt;','&amp;gt;')
+
+    if not ok:
+        msg += '&lt;br/&gt;&lt;font color="red"&gt;%s&lt;/font&gt;' % options.get('err_msg', '')
+
+    # ret = {'ok': False, 'msg': 'ans=%s' % ans}
+    ret = {'ok': ok, 'msg': msg}
+    return ret
+
+def check_example2(expect, ans, dcf=dnd_check_formula):
+    dmap = {'a': 'a', 'c': 'c', 'b': 'b', 'btwo': 'b^2', 'ctwo': 'c^2', 'minusb': '-b', 'two': '2', 'minusa': '-a', 'four': '4', 'one': '1', 'atwo': 'a^2'}
+    formula = '( ({_1}) + cos( ({_2}) - ({_3}) * ({_4}) * ({_5}) ) )/ ( ({_6}) * ({_12}) )'
+    samples = 'a,c,b@1,1,1:20,20,20#20'
+    expect = ' ( -b + cos( b^2 - 4 * a * c ) ) / ( 2 * a ) '
+    options = {'allow_empty': False,
+               'err_msg': '',
+               'hide_formula_input': True,
+    }
+
+    # call dnd_check_formula to do mapping from dnd to formual and to test expression
+    return dcf(expect, ans, dmap, formula, samples, options)
+
+# keep note of check function for other hinting code
+dnd_check_function = check_example2
+
+
+</script>
+  <solution>
+    <img src="/static/images/example2/example2_dnd_sol.png"/>
+  </solution>
+</span>

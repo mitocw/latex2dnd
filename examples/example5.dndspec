@@ -1,0 +1,25 @@
+%
+% example5.dndspec: sample showing drag-and-drop problem created with box on image,
+%                   using the callouts.sty package (and tikz)
+%
+EXTRA_HEADER_TEX: \usepackage[bwr]{callouts}
+BOX_WIDTH: 11ex
+BOX_HEIGHT: 6ex
+MATCH_LABELS: \frac{|g\>+|e\>}{\sqrt{2}}, |g\>
+ALL_LABELS: \frac{|g\>+|e\>}{\sqrt{2}}, \frac{|g\>-|e\>}{\sqrt{2}}, \frac{|g\>+i |e\>}{\sqrt{2}}
+ALL_LABELS: \frac{|g\>-i|e\>}{\sqrt{2}}, |g\>, |e\>
+BEGIN_EXPRESSION
+\begin{center}
+ \begin{annotate}{\includegraphics[width=0.41\textwidth]{example5_figure.png}}{0.56}
+   % \helpgrid
+   \note{2.9,2.5}{ \frac{|g\>+|e\>}{\sqrt{2}} }
+   \note{4,0}{\parbox{3ex}{~\\~\\~\\~\\}}
+ \end{annotate}
+ \\[-4ex]
+ This picture describes the Bloch sphere evolution \\
+ of the initial state $ \frac{|g\>+|e\>}{\sqrt{2}} $ \\
+ decaying to the final state $ |g\> $
+\end{center}
+END_EXPRESSION
+% CHECK_FORMULA: 2 * v / ( mu * Bprime )
+

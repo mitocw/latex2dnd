@@ -1,0 +1,38 @@
+%
+% example2.dndspec: quadratic formula
+%
+% This is an edX drag-and-drop problem defined using a "dndspec" file,
+% a plain-text representation which is easily edited.
+% 
+% Some properties of this specification:
+% - Note spaces around every label in the tex expression.
+% - The check formula also has spaces around each label.
+% - Labels are presented in the order specified in the ALL_LABELS line
+% - Lines starting in '%' are comments; blank lines are disregarded.
+%
+% Compile this into the *.xml and *.png files needed, using
+% latex2edx filename.dndspec
+% 
+% CHECK_FORMULA provides an equation into which symbols are inserted by the system
+%               at runtime, to check for correctness of an expression.  This allows
+%               drag-and-drop expressions to be evalauted for correctness based on
+%               mathematical properties, including commutativity.
+%
+% TEST_CORRECT and TEST_INCORRECT generate unit tests, wich are executed during
+%               latex2dnd compilation, which check that the formula evaluates correctly
+%               and that the specified tests evaluate to the specified outcomes (correct
+%               and incorrect).  
+
+MATCH_LABELS: -b, b^2, 4, a, c, 2
+ALL_LABELS: 1, 2, 4, a, -a, b, -b, c, a^2, b^2, c^2
+
+BEGIN_EXPRESSION
+$$\lambda_\pm = \frac{ -b \pm \sqrt{ b^2 - 4 a c }}{ 2 a }$$
+END_EXPRESSION
+
+CHECK_FORMULA: ( -b + cos( b^2 - 4 * a * c ) ) / ( 2 * a )
+CHECK_FORMULA_BOXES: ( ([1]) + cos( ([2]) - ([3]) * ([4]) * ([5]) ) )/ ( ([6]) * ([12]) )
+TEST_CORRECT: ( -b + sqrt( b^2 - c * a * 4 ) ) / ( a * 2 )
+TEST_INCORRECT: ( -b + sqrt( b^2 - c * a^2 * 4 ) ) / ( a * 2 )
+TEST_INCORRECT: ( -b + sqrt( b^2 - c * a^2 * 4 ) ) / ( c * 2 )
+

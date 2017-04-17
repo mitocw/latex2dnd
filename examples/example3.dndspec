@@ -1,0 +1,24 @@
+%
+% example4.dndspec: Rabi oscillation - no check formula
+%
+% This is an edX drag-and-drop problem defined using a "dndspec" file,
+% a plain-text representation which is easily edited.
+% 
+% Some properties of this specification:
+% - Note spaces around every label in the tex expression.
+% - The check formula also has spaces around each label.
+% - Labels are presented in the order specified in the ALL_LABELS line
+% - Lines starting in '%' are comments; blank lines are disregarded.
+%
+% Compile this into the *.xml and *.png files needed, using
+% latex2edx filename.dndspec
+% 
+
+MATCH_LABELS: \Omega_1^2, \Omega^2, \sin^2, \frac{\Omega t}{2}
+ALL_LABELS: \Omega_1, \Omega_1^2, \Omega, \Omega^2, \cos^2, \sin^2, \Omega t, \frac{\Omega t}{2}
+BEGIN_EXPRESSION
+\bea
+        P(t) = 1 - \frac{ \Omega_1^2 }{ \Omega^2 } \sin^2 \left( \frac{\Omega t}{2} \right)
+\nonumber
+\eea
+END_EXPRESSION

@@ -1,0 +1,79 @@
+% ==================================================================
+% callouts.sty 
+% ==================================================================
+% (c) 2017 Markus Stuetz, markus.stuetz@gmail.com
+% This program can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Distributed from CTAN
+% archives in directory macros/latex/base/lppl.txt; either
+% version 1 of the License, or any later version.
+% ==================================================================
+
+\ProvidesPackage{callouts}[2017/03/16 Callouts]
+\NeedsTeXFormat{LaTeX2e}
+\RequirePackage{tikz}
+% \RequirePackage{kvoptions}
+% 
+% \tikzset{every picture/.style={font issue=\footnotesize},
+%          font issue/.style={execute at begin picture={#1\selectfont}}
+%         }
+
+% \DeclareStringOption[red]{color}[black]{
+%   \@arrowcolor
+%   }
+
+\DeclareOption{plain}{%
+\newcommand{\focol}{black}
+\newcommand{\bgcol}{none}
+\newcommand{\arcol}{black}
+}
+
+\DeclareOption{bwr}{%
+\newcommand{\focol}{black}
+\newcommand{\bgcol}{white}
+\newcommand{\arcol}{red}
+}
+
+\DeclareOption{wby}{%
+\newcommand{\focol}{white}
+\newcommand{\bgcol}{black}
+\newcommand{\arcol}{yellow}
+}
+
+\DeclareOption{bww}{%
+\newcommand{\focol}{black}
+\newcommand{\bgcol}{white}
+\newcommand{\arcol}{white}
+}
+
+\DeclareOption*{\ClassWarning{annotations}{Unknown color option '\CurrentOption'}\ExecuteOptions{none}}
+
+\newcommand{\hecol}{black}
+
+\ProcessOptions\relax	% terminate option processing
+
+% ==================================================================
+
+\newenvironment{annotate}[2]%[num]%
+{ \begin{tikzpicture}[scale=#2]% }%
+% Annotate
+\node (pic) at (0,0) {#1};%
+}%
+{ \end{tikzpicture} }
+
+% ==================================================================
+
+\newcommand{\helpgrid}{%
+\draw[help lines, \hecol] (pic.south west) grid (pic.north east); \fill[\hecol] (0,0) circle (5pt);%
+}
+\newcommand{\callout}[3]{%
+\node [fill=\bgcol] (text) at (#1) {\scriptsize\color{\focol} #2};
+\draw [\arcol,thick,->] (text) -- (#3);
+}
+\newcommand{\note}[2]{%
+\node [fill=\bgcol] at (#1) {\scriptsize\color{\focol} #2};
+}
+\newcommand{\arrow}[2]{%
+\draw [\arcol,thick,->] (#1) -- (#2);
+}
+
+\endinput % === EOF ================================================

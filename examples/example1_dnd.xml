@@ -1,0 +1,28 @@
+<span>
+  <customresponse>
+    <drag_and_drop_input img="/static/images/example1/example1_dnd.png" target_outline="false" one_per_target="true" no_labels="true" label_bg_color="rgb(222, 139, 238)">
+      <draggable id="mone" icon="/static/images/example1/example1_dnd_label1.png"/>
+      <draggable id="mtwo" icon="/static/images/example1/example1_dnd_label2.png"/>
+      <draggable id="monemtwo" icon="/static/images/example1/example1_dnd_label3.png"/>
+      <draggable id="monetwomtwo" icon="/static/images/example1/example1_dnd_label4.png"/>
+      <draggable id="monetwomtwotwo" icon="/static/images/example1/example1_dnd_label5.png"/>
+      <draggable id="r" icon="/static/images/example1/example1_dnd_label6.png"/>
+      <draggable id="rtwo" icon="/static/images/example1/example1_dnd_label7.png"/>
+      <target id="1" x="140" y="1" w="145" h="103"/>
+      <!-- answer=monemtwo -->
+      <target id="2" x="123" y="144" w="146" h="103"/>
+      <!-- answer=r -->
+    </drag_and_drop_input>
+    <answer>
+caset = [{'monemtwo': '1'}, {'r': '2'}]
+ca = [ {"draggables": ca.keys(),"targets": ca.values(),"rule":"exact"} for ca in caset ]
+if draganddrop.grade(submission[0], ca):
+    correct = ["correct"]
+else:
+    correct = ["incorrect"]
+</answer>
+  </customresponse>
+  <solution>
+    <img src="/static/images/example1/example1_dnd_sol.png"/>
+  </solution>
+</span>

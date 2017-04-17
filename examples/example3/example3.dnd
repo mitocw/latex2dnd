@@ -1,0 +1,13 @@
+OPTIONS: HIDE_FORMULA_INPUT
+LABEL: 1 = Omegaone /// Omega1
+LABEL: 2 = Omegaonetwo /// Omega1^2
+LABEL: 3 = Omega /// Omega
+LABEL: 4 = Omegatwo /// Omega^2
+LABEL: 5 = costwo /// cos^2
+LABEL: 6 = sintwo /// sin^2
+LABEL: 7 = Omegat /// Omegat
+LABEL: 8 = fracOmegattwo /// fracOmegat2
+BOX: 1 = Omegaonetwo
+BOX: 2 = Omegatwo
+BOX: 3 = sintwo
+BOX: 4 = fracOmegattwo

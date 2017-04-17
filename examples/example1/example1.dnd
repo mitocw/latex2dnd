@@ -1,0 +1,10 @@
+OPTIONS: HIDE_FORMULA_INPUT
+LABEL: 1 = mone /// m1
+LABEL: 2 = mtwo /// m2
+LABEL: 3 = monemtwo /// m1m2
+LABEL: 4 = monetwomtwo /// m1^2m2
+LABEL: 5 = monetwomtwotwo /// m1^2m2^2
+LABEL: 6 = r /// r
+LABEL: 7 = rtwo /// r^2
+BOX: 1 = monemtwo
+BOX: 2 = r

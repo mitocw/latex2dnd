@@ -1,0 +1,16 @@
+OPTIONS: HIDE_FORMULA_INPUT
+LABEL: 1 = one /// 1
+LABEL: 2 = two /// 2
+LABEL: 3 = three /// 3
+LABEL: 4 = Bprime /// Bprime
+LABEL: 5 = mu /// mu
+LABEL: 6 = v /// v
+LABEL: 7 = vtwo /// v^2
+BOX: 1 = two
+BOX: 2 = v
+BOX: 3 = mu
+BOX: 4 = Bprime
+FORMULA:  ([1]) * ([2]) / ( ([3]) * ([4]) ) 
+FORMULA_SAMPLES:  mu,Bprime,v@1,1,1:20,20,20\#20 
+FORMULA_EXPECT:  2 * v / ( mu * Bprime ) 
+FORMULA_ERR: 

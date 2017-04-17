@@ -1,12 +1,12 @@
-=========
 latex2dnd
 =========
 
 Generate an edX drag-and-drop problem, complete with draggable labels, problem image, and
 solution image, from an input latex file.
 
+
 Installation
-============
+------------
 
     pip install -e git+https://github.com/mitocw/latex2dnd.git#egg=latex2dnd
 
@@ -17,12 +17,11 @@ Note that pdftoppm is needed.  With osX and macbrew:
 A working latex installation is also required.
 
 Usage
-=====
+-----
 
-Usage: latex2dnd [options] filename.tex
+Usage: latex2dnd [options] [filename.tex | filename.dndspec]
 
 Options:
-
   --version             show program's version number and exit
   -h, --help            show this help message and exit
   -v, --verbose         verbose messages
@@ -35,11 +34,20 @@ Options:
                         Directory name for output PNG files
   -c CONFIG_FILE, --config-file=CONFIG_FILE
                         configuration file to load
+  -u IMAGE_URL, --url-for-images=IMAGE_URL
+                        base URL for images
   -r RESOLUTION, --resolution=RESOLUTION
-                        Resolution of PNG files in DPI
+                        Resolution of PNG files in DPI (default 300), can set
+                        to 'max' to auto-scale
+  --cfn=CUSTOM_CFN      Name of python script check function to use for drag-
+                        drop checking
+  --output-tex          Final output should be a tex file (works when input is
+                        a *.dndspec file)
+  --cleanup             Remove old solution image files, and tmp.pdf
+  --nonrandom           Do not use a random string in the solution filename
 
 Example
-=======
+-------
 
 Get quadratic.tex from the latex2dnd/testtex directory, and run this:
 
@@ -72,7 +80,7 @@ Insert this into your course with (if you're using https://github.com/mitocw/lat
 and copy the png files to /static/images/quadratic/
 
 LaTeX Macros
-============
+------------
 
 latex2dnd works by introducing three important new macros:
 
@@ -156,7 +164,7 @@ Note that more labels are defined than just the correct ones.  This is the XML g
     </span>
 
 Simplified DND Specification
-============================
+----------------------------
 
 LaTeX is powerful, but can be fragile.  A simpler way to write DND
 problems is to use a "dndspec" specification file; this provides a
@@ -216,7 +224,7 @@ More formally:
 There should be no leading spaces / indentation on lines with keywords (like MATCH_LABELS).
 
 Advanced usage
-==============
+--------------
 
 Here are some additional useful macros:
 
@@ -232,7 +240,7 @@ Here are some additional useful macros:
     \DDtest{incorrect}{1,2,3,4}{G,d2,m1,m2}
 
 Notes
-=====
+-----
 
 latex2dnd uses the "-region" feature of imagemagick's convert command,
 to white out solution boxes and generate the problem image.  Version
@@ -243,8 +251,9 @@ encounter this problem, one workaround is to back out to version 6.9.1
 of imagemagick.
 
 History
-=======
+-------
 
+```
 * v0.9.0: python package, with unit tests
 *     .1: add -C (can_reuse) flag
 *     .2: improved box alignment and pixel position computation
@@ -254,3 +263,5 @@ History
 *     .6: add \DDoptins{CUSTOM_CFN=xxx} and --cfn=xxx command line for custom DND result check function
 * v1.0.0: add unit tests for DDformula, which automatically verify expected response is checked properly
 * v1.1.0: implement dndspec, a simplified DND problem specification language
+*     .1: more improvements to dndspec; use random string in solution image filename; add examples
+```

@@ -1,0 +1,10 @@
+OPTIONS: HIDE_FORMULA_INPUT
+LABEL: 1 = fracgplusesqrttwo /// fracgplusesqrt2
+LABEL: 2 = fracgminusesqrttwo /// fracgminusesqrt2
+LABEL: 3 = fracgplusiesqrttwo /// fracgplusiesqrt2
+LABEL: 4 = fracgminusiesqrttwo /// fracg-iesqrt2
+LABEL: 5 = g /// g
+LABEL: 6 = e /// e
+BOX: 1 = fracgplusesqrttwo
+BOX: 7 = fracgplusesqrttwo
+BOX: 2 = g

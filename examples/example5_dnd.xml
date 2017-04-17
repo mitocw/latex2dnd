@@ -1,0 +1,29 @@
+<span>
+  <customresponse>
+    <drag_and_drop_input img="/static/images/example5/example5_dnd.png" target_outline="false" one_per_target="true" no_labels="true" label_bg_color="rgb(222, 139, 238)">
+      <draggable id="fracgplusesqrttwo" icon="/static/images/example5/example5_dnd_label1.png"/>
+      <draggable id="fracgminusesqrttwo" icon="/static/images/example5/example5_dnd_label2.png"/>
+      <draggable id="fracgplusiesqrttwo" icon="/static/images/example5/example5_dnd_label3.png"/>
+      <draggable id="fracgminusiesqrttwo" icon="/static/images/example5/example5_dnd_label4.png"/>
+      <draggable id="g" icon="/static/images/example5/example5_dnd_label5.png"/>
+      <draggable id="e" icon="/static/images/example5/example5_dnd_label6.png"/>
+      <target id="1" x="472" y="134" w="114" h="87"/>
+      <!-- answer=fracgplusesqrttwo -->
+      <target id="7" x="430" y="644" w="162" h="114"/>
+      <!-- answer=fracgplusesqrttwo -->
+      <target id="2" x="490" y="784" w="163" h="113"/>
+      <!-- answer=g -->
+    </drag_and_drop_input>
+    <answer>
+caset = [{'fracgplusesqrttwo': '1'}, {'fracgplusesqrttwo': '7'}, {'g': '2'}]
+ca = [ {"draggables": ca.keys(),"targets": ca.values(),"rule":"exact"} for ca in caset ]
+if draganddrop.grade(submission[0], ca):
+    correct = ["correct"]
+else:
+    correct = ["incorrect"]
+</answer>
+  </customresponse>
+  <solution>
+    <img src="/static/images/example5/example5_dnd_sol.png"/>
+  </solution>
+</span>

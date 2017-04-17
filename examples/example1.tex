@@ -1,0 +1,127 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% DND tex file generated from example1.dndspec
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%
+% example2.dndspec: gravity formula
+%
+% This is an edX drag-and-drop problem defined using a "dndspec" file,
+% a plain-text representation which is easily edited.
+% 
+% Some properties of this specification:
+% - Note spaces around every label in the tex expression.
+% - The check formula also has spaces around each label.
+% - Labels are presented in the order specified in the ALL_LABELS line
+% - Lines starting in '%' are comments; blank lines are disregarded.
+%
+% Compile this into the *.xml and *.png files needed, using
+% latex2edx filename.dndspec
+% 
+
+
+\documentclass{article}
+\usepackage{amsmath}
+
+
+
+\input{latex2dnd}
+
+\def\lbL{\lb\rule{0pt}{2.4ex}}
+\def\lpL{\left(\rule{0pt}{2.4ex}}
+\def\lb{\left[}         \def\rb{\right]}
+\def\lp{\left(}         \def\rp{\right)}
+\def\rar{\rightarrow}
+\def\del{\nabla}
+\def\w{\omegaup}
+\def\ket#1{\left\vert #1 \right\rangle}
+\def\bra#1{\left\langle #1 \right\vert}
+\def\M#1#2{M_{#1}( #2) }
+\def\R#1#2{R_{#1}( #2 ) }
+\def\adag{a^\dagger}
+\def\bdag{b^\dagger}
+\def\Bdag{B^\dagger}
+
+\def\bea{\begin{eqnarray}}
+\def\eea{\end{eqnarray}}
+\def\ben{\begin{eqnarray*}}
+\def\een{\end{eqnarray*}}
+
+\def\non{\nonumber}
+
+\def\>{\rangle}
+\def\<{\langle}
+\def\l{\left}
+\def\r{\right}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% OPTIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \DDoptions{ALLOW_EMPTY}
+\DDoptions{HIDE_FORMULA_INPUT}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% define drag-drop labels
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\DDlabel[m1]{mone}{$m_1$}
+\DDlabel[m2]{mtwo}{$m_2$}
+\DDlabel[m1m2]{monemtwo}{$m_1 m_2$}
+\DDlabel[m1^2m2]{monetwomtwo}{$m_1^2 m_2$}
+\DDlabel[m1^2m2^2]{monetwomtwotwo}{$m_1^2 m_2^2$}
+\DDlabel[r]{r}{$r$}
+\DDlabel[r^2]{rtwo}{$r^2$}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% shorthand macro to make boxes the same size
+%
+% edit these if boxes too small
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand\DDB[2]{\DDbox{#1}{8ex}{4ex}{#2}}
+\newcommand\DDBB[2]{\DDbox{#1}{10ex}{6ex}{#2}}
+\newcommand\DDBBB[2]{\DDbox{#1}{12ex}{6ex}{#2}}
+\newcommand\DDBBBB[2]{\DDbox{#1}{14ex}{6ex}{#2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% original expression, for reference
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{equation}
+%    F = \frac{ G m_1 m_2 }{ r }
+%\nonumber
+%\end{equation}
+%
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dnd expression with boxes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{equation}
+    F = \frac{ G \DDB{1}{monemtwo} }{ \DDB{2}{r} }
+\nonumber
+\end{equation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dnd check formula
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dnd formula tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% output labels, with fixed box heights
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\writeDDlabels[4.3ex]
+
+\end{document}
+

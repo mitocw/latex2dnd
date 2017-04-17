@@ -1,0 +1,130 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% DND tex file generated from example5.dndspec
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%
+% example5.dndspec: sample showing drag-and-drop problem created with box on image,
+%                   using the callouts.sty package (and tikz)
+%
+% CHECK_FORMULA: 2 * v / ( mu * Bprime )
+
+
+\documentclass{article}
+\usepackage{amsmath}
+
+\usepackage[bwr]{callouts}
+
+\input{latex2dnd}
+
+\def\lbL{\lb\rule{0pt}{2.4ex}}
+\def\lpL{\left(\rule{0pt}{2.4ex}}
+\def\lb{\left[}         \def\rb{\right]}
+\def\lp{\left(}         \def\rp{\right)}
+\def\rar{\rightarrow}
+\def\del{\nabla}
+\def\w{\omegaup}
+\def\ket#1{\left\vert #1 \right\rangle}
+\def\bra#1{\left\langle #1 \right\vert}
+\def\M#1#2{M_{#1}( #2) }
+\def\R#1#2{R_{#1}( #2 ) }
+\def\adag{a^\dagger}
+\def\bdag{b^\dagger}
+\def\Bdag{B^\dagger}
+
+\def\bea{\begin{eqnarray}}
+\def\eea{\end{eqnarray}}
+\def\ben{\begin{eqnarray*}}
+\def\een{\end{eqnarray*}}
+
+\def\non{\nonumber}
+
+\def\>{\rangle}
+\def\<{\langle}
+\def\l{\left}
+\def\r{\right}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% OPTIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \DDoptions{ALLOW_EMPTY}
+\DDoptions{HIDE_FORMULA_INPUT}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% define drag-drop labels
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\DDlabel[fracgplusesqrt2]{fracgplusesqrttwo}{$\frac{|g\>+|e\>}{\sqrt{2}}$}
+\DDlabel[fracgminusesqrt2]{fracgminusesqrttwo}{$\frac{|g\>-|e\>}{\sqrt{2}}$}
+\DDlabel[fracgplusiesqrt2]{fracgplusiesqrttwo}{$\frac{|g\>+i |e\>}{\sqrt{2}}$}
+\DDlabel[fracg-iesqrt2]{fracgminusiesqrttwo}{$\frac{|g\>-i|e\>}{\sqrt{2}}$}
+\DDlabel[g]{g}{$|g\>$}
+\DDlabel[e]{e}{$|e\>$}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% shorthand macro to make boxes the same size
+%
+% edit these if boxes too small
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand\DDB[2]{\DDbox{#1}{11ex}{6ex}{#2}}
+\newcommand\DDBB[2]{\DDbox{#1}{10ex}{6ex}{#2}}
+\newcommand\DDBBB[2]{\DDbox{#1}{12ex}{6ex}{#2}}
+\newcommand\DDBBBB[2]{\DDbox{#1}{14ex}{6ex}{#2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% original expression, for reference
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{center}
+% \begin{annotate}{\includegraphics[width=0.41\textwidth]{example5_figure.png}}{0.56}
+%   % \helpgrid
+%   \note{2.9,2.5}{ \frac{|g\>+|e\>}{\sqrt{2}} }
+%   \note{4,0}{\parbox{3ex}{~\\~\\~\\~\\}}
+% \end{annotate}
+% \\[-4ex]
+% This picture describes the Bloch sphere evolution \\
+% of the initial state $ \frac{|g\>+|e\>}{\sqrt{2}} $ \\
+% decaying to the final state $ |g\> $
+%\end{center}
+%
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dnd expression with boxes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{center}
+ \begin{annotate}{\includegraphics[width=0.41\textwidth]{example5_figure.png}}{0.56}
+   % \helpgrid
+   \note{2.9,2.5}{ \DDB{1}{fracgplusesqrttwo} }
+   \note{4,0}{\parbox{3ex}{~\\~\\~\\~\\}}
+ \end{annotate}
+ \\[-4ex]
+ This picture describes the Bloch sphere evolution \\
+ of the initial state $ \DDB{7}{fracgplusesqrttwo} $ \\
+ decaying to the final state $ \DDB{2}{g} $
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dnd check formula
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% dnd formula tests
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% output labels, with fixed box heights
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\writeDDlabels[4.3ex]
+
+\end{document}
+
