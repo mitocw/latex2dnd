@@ -78,7 +78,11 @@ class DNDlabel(object):
         if m:
             self.math_variable = None
             return
-        m = re.match('([a-zA-Z]+[0-9]*)\^([0-9]+)', self.math_exp)
+        m = re.match('-*([a-zA-Z]+[0-9]*)\^([0-9]+)', self.math_exp)
+        if m:
+            self.math_variable = m.group(1)
+            return
+        m = re.match('-*([a-zA-Z]+[0-9]*)', self.math_exp)
         if m:
             self.math_variable = m.group(1)
             return
