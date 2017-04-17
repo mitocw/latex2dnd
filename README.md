@@ -50,7 +50,9 @@ Options:
 Example
 -------
 
-See [examples directory](https://github.com/mitocw/latex2dnd/tree/master/examples).
+See *.tex and *.dndspec files in the [examples directory](https://github.com/mitocw/latex2dnd/tree/master/examples).
+
+![Another example dnd problem image](https://github.com/mitocw/latex2dnd/raw/master/examples/example5/example5_dnd.png "Example drag-and-drop problem: bloch sphere")
 
 Or: get quadratic.tex from the latex2dnd/testtex directory, and run this:
 
