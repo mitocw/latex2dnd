@@ -8,6 +8,9 @@
 
 \documentclass{article}
 \usepackage{amsmath}
+
+<EXTRA_HEADER_TEX>
+
 \input{latex2dnd}
 
 \def\lbL{\lb\rule{0pt}{2.4ex}}
@@ -59,7 +62,7 @@
 %
 % edit these if boxes too small
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand\DDB[2]{\DDbox{#1}{<BOX_WIDTH>}{4ex}{#2}}
+\newcommand\DDB[2]{\DDbox{#1}{<BOX_WIDTH>}{<BOX_HEIGHT>}{#2}}
 \newcommand\DDBB[2]{\DDbox{#1}{10ex}{6ex}{#2}}
 \newcommand\DDBBB[2]{\DDbox{#1}{12ex}{6ex}{#2}}
 \newcommand\DDBBBB[2]{\DDbox{#1}{14ex}{6ex}{#2}}

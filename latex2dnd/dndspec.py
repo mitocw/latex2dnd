@@ -204,10 +204,12 @@ class DNDspec2tex(object):
         self.distractor_labels = []
         self.all_labels = []
         self.box_width = "8ex"
+        self.box_height = "4ex"
         self.expression = ""
         self.check_formula = None
         self.check_formula_boxes = None
         self.comments = ""
+        self.extra_header_tex = ""
         self.formula_tests = []		# list of dicts specifying tests
         self.label_objects_by_box_index = {}	# key=index, val=DNDlabel object
         self.label_objects_by_draggable_id = {}	# key = draggable label, val=DNDlabel object
@@ -217,6 +219,32 @@ class DNDspec2tex(object):
             lines = open(sfn)
         else:
             lines = input_tex.split('\n')
+
+        def splitstr(s):
+            return [x.strip() for x in s.split(',')]
+            
+        def space_pad(s):
+            return ' ' + s + ' '
+
+        def make_test_correct(s):
+            test_formula = ' ' + s + ' '            
+            return {'etype': 'correct', 'formula': test_formula}
+
+        def make_test_incorrect(s):
+            test_formula = ' ' + s + ' '            
+            return {'etype': 'incorrect', 'formula': test_formula}
+
+        keyword_table = {'BOX_WIDTH': {'field': 'box_width', 'func': None},
+                         'BOX_HEIGHT': {'field': 'box_height', 'func': None},
+                         'EXTRA_HEADER_TEX': {'field': 'extra_header_tex', 'func': None},
+                         'MATCH_LABELS': {'field': 'match_labels', 'func': splitstr},
+                         'DISTRACTOR_LABELS': {'field': 'distractor_labels', 'func': splitstr, 'add': True},
+                         'ALL_LABELS': {'field': 'all_labels', 'func': splitstr, 'add': True},
+                         'CHECK_FORMULA': {'field': 'check_formula', 'func': space_pad},
+                         'CHECK_FORMULA_BOXES': {'field': 'check_formula_boxes', 'func': space_pad},
+                         'TEST_CORRECT': {'field': 'formula_tests', 'func': make_test_correct, 'append': True},
+                         'TEST_INCORRECT': {'field': 'formula_tests', 'func': make_test_incorrect, 'append': True},
+        }
 
         for k in lines:
             if mode=="in_expression":
@@ -233,40 +261,20 @@ class DNDspec2tex(object):
                 continue
             if len(k.strip())==0:	# skip empty lines
                 continue
-            m = re.match('^BOX_WIDTH:(.*)', k)
-            if m:
-                self.box_width = m.group(1).strip()
-                continue
-            m = re.match('^MATCH_LABELS:(.*)', k)
-            if m:
-                self.match_labels = [x.strip() for x in m.group(1).split(',')]
-                continue
-            m = re.match('^DISTRACTOR_LABELS:(.*)',k)
-            if m:
-                self.distractor_labels = [x.strip() for x in m.group(1).split(',')]
-                continue
-            m = re.match('^ALL_LABELS:(.*)',k)
-            if m:
-                self.all_labels += [x.strip() for x in m.group(1).split(',')]
-                continue
-            m = re.match('^CHECK_FORMULA:(.*)',k)
-            if m:
-                self.check_formula = ' ' + m.group(1).strip() + ' '
-                continue
-            m = re.match('^CHECK_FORMULA_BOXES:(.*)',k)
-            if m:
-                self.check_formula_boxes = m.group(1).strip()
-                continue
-            m = re.match('^TEST_CORRECT:(.*)',k)
-            if m:
-                test_formula = ' ' + m.group(1).strip() + ' '
-                self.formula_tests.append({'etype': 'correct', 'formula': test_formula})
-                continue
-            m = re.match('^TEST_INCORRECT:(.*)',k)
-            if m:
-                test_formula = ' ' + m.group(1).strip() + ' '
-                self.formula_tests.append({'etype': 'incorrect', 'formula': test_formula})
-                continue
+
+            for kw, kwinfo in keyword_table.items():
+                m = re.match('^%s:(.*)' % kw, k)
+                if m:
+                    val = m.group(1).strip()
+                    val = (kwinfo['func'] or (lambda x: x))(val)
+                    if kwinfo.get('append'):
+                        getattr(self, kwinfo['field']).append(val)
+                    elif kwinfo.get('add'):
+                        setattr(self, kwinfo['field'], getattr(self, kwinfo['field']) + val)
+                    else:
+                        setattr(self, kwinfo['field'], val)
+                    break
+
         if self.verbose:
             print "[dndspec] from file %s read %d match labels, %d labels alltogether, and %d tests" % (sfn,
                                                                                                         len(self.match_labels),
@@ -320,6 +328,7 @@ class DNDspec2tex(object):
         expr = expr.replace('(', '\(').replace(')', '\)')
         expr = expr.replace('[', '\[').replace(']', '\]')
         expr = expr.replace('+', '\+')
+        expr = expr.replace('|', '\|')
         return expr
 
     def assemble_dnd_expression(self):
@@ -481,6 +490,8 @@ class DNDspec2tex(object):
                   'COMMENTS': self.comments,
                   'DD_FORMULA_TESTS': self.formula_test_tex,
                   'BOX_WIDTH': self.box_width,
+                  'BOX_HEIGHT': self.box_height,
+                  'EXTRA_HEADER_TEX': self.extra_header_tex,
                   }
         for key, val in params.items():
             template = template.replace('<' + key + '>', val)
@@ -547,4 +558,5 @@ CHECK_FORMULA: 2 * v / ( mu * Bprime )
         dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
     except Exception as err:
         pass
+    print str(err)
     assert "WARNING: no matching label 'mu' found" in str(err)
