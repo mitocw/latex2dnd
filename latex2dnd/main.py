@@ -690,7 +690,7 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
     Main command line.  Accepts args, to allow for simple unit testing.
     '''
     parser = optparse.OptionParser(usage="usage: %prog [options] [filename.tex | filename.dndspec]",
-                                   version="%prog 1.1.0")
+                                   version="%prog 1.1.1")
     parser.add_option('-v', '--verbose', 
                       dest='verbose', 
                       default=False, action='store_true',
@@ -742,6 +742,11 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
                       dest="do_cleanup",
                       default=False,
                       help="Remove old solution image files, and tmp.pdf",)
+    parser.add_option("--nonrandom",
+                      action="store_true",
+                      dest="nonrandom",
+                      default=False,
+                      help="Do not use a random string in the solution filename",)
 
     if not opts:
         (opts, args) = parser.parse_args(arglist)
@@ -766,6 +771,7 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
                           can_reuse=opts.can_reuse,
                           custom_cfn=opts.custom_cfn,
                           do_cleanup=opts.do_cleanup,
+                          randomize_solution_filename=(not opts.nonrandom),
     )
     if return_object:
         return l2d
