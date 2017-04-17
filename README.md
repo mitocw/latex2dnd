@@ -50,7 +50,7 @@ Options:
 Example
 -------
 
-See [https://github.com/mitocw/latex2dnd/tree/master/examples](examples directory).
+See [examples directory](https://github.com/mitocw/latex2dnd/tree/master/examples).
 
 Or: get quadratic.tex from the latex2dnd/testtex directory, and run this:
 
