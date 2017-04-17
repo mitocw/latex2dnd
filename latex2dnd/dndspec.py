@@ -299,6 +299,16 @@ class DNDspec2tex(object):
         self.label_objs = label_objs
         self.label_tex = '\n'.join(ltex)
         
+    def escape_regexp(self, expr):
+        '''
+        Escape tex expression to avoid undesirable regular expression matches.
+        '''
+        expr = expr.replace('\\', '\\\\').replace('{', '\{').replace('^', '\^')
+        expr = expr.replace('(', '\(').replace(')', '\)')
+        expr = expr.replace('[', '\[').replace(']', '\]')
+        expr = expr.replace('+', '\+')
+        return expr
+
     def assemble_dnd_expression(self):
         '''
         asssemble dnd expression from provided input.
@@ -308,10 +318,12 @@ class DNDspec2tex(object):
         self.commented_expression = '%' + self.expression.replace('\n', '\n%') + '\n%'
         for label in self.match_labels:
             lobj = self.label_objs[label]
-            labre = "\s%s\s" % label.replace('\\', '\\\\').replace('{', '\{').replace('^', '\^')
-            labre = labre.replace('(', '\(').replace(')', '\)')
-            labre = labre.replace('+', '\+')
-            matches = re.findall(labre, dnd_expression, flags=re.M)
+            labre = "\s%s\s" % self.escape_regexp(label)
+            try:
+                matches = re.findall(labre, dnd_expression, flags=re.M)
+            except Exception as err:
+                print "Error in dndspec - failed to assemble DND expression, labre=%s, dnd_expression=%s" % (labre, dnd_expression)
+                raise
             if not matches:
                 print "--> [dndspec] WARNING: no matching label '%s' found in expression!" % label
                 print "expression = %s" % dnd_expression
@@ -338,8 +350,7 @@ class DNDspec2tex(object):
         labelset = labelset or self.match_labels
         for label in labelset:
             lobj = self.label_objs[label]
-            labre = "\s%s\s" % lobj.math_exp.replace('^', '\^').replace('(', '\(').replace(')', '\)')
-            labre = labre.replace('+', '\+')
+            labre = "\s%s\s" % self.escape_regexp(lobj.math_exp)
             (formula, nmatch) = re.subn(labre, lobj.formula_box, formula)
             if not nmatch and (not missing_ok):
                 msg = "--> [dndspec] WARNING: no matching math expression found for '%s' (%s) in formula" % (label, lobj.math_exp)
