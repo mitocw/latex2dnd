@@ -28,7 +28,7 @@ class TestGravityWithOptions(unittest.TestCase):
             nfn = '%s/%s' % (tmdir, fn.basename())
             os.system('cp %s/* %s' % (testdir, tmdir))
             os.chdir(tmdir)
-            l2dnd = LatexToDragDrop(nfn, verbose=True)
+            l2dnd = LatexToDragDrop(nfn, verbose=True, randomize_solution_filename=False)
 
             self.assertTrue(len(l2dnd.test_results)==3)
 
