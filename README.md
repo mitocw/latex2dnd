@@ -4,6 +4,7 @@ latex2dnd
 Generate an edX drag-and-drop problem, complete with draggable labels, problem image, and
 solution image, from an input latex file.
 
+![Example dnd problem image](https://github.com/mitocw/latex2dnd/raw/master/examples/example2/example2_dnd.png "Example drag-and-drop problem: quadratic formula")
 
 Installation
 ------------
