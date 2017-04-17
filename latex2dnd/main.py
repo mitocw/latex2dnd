@@ -27,6 +27,7 @@ import json
 import optparse
 import random
 import string
+import glob
 try:
     from path import path
 except:
@@ -269,7 +270,7 @@ class LatexToDragDrop(object):
     '''
     
     def __init__(self, texfn, compile=True, verbose=True, dpi=300, imverbose=False, outdir='.',
-                 can_reuse=False, custom_cfn=None, randomize_solution_filename=True):
+                 can_reuse=False, custom_cfn=None, randomize_solution_filename=True, do_cleanup=False):
         '''
         texfn = *.tex filename
         '''
@@ -296,6 +297,7 @@ class LatexToDragDrop(object):
             print "Error: output directory '%s' is not a directory" % outdir
             return
 
+        self.outdir = outdir
         self.max_image_width = 780
         self.options = {}
         self.test_results = {}
@@ -319,9 +321,17 @@ class LatexToDragDrop(object):
         # by convention, page 1 has the main drag-and-drop image,
         # and page 2 has the labels, in individual boxes.
 
+        if do_cleanup:
+            self.cleanup_old_solution_image_files()
+
         self.generate_dnd_image()
         self.generate_label_images(outdir)
         self.generate_dnd_xml()
+
+        if do_cleanup and os.path.exists("tmp.pdf"):
+            os.unlink("tmp.pdf")
+            if verbose:
+                print "    Removed tmp.pdf"
 
         if verbose:
             print "="*70
@@ -336,6 +346,20 @@ class LatexToDragDrop(object):
             print "The DND image has size %s x %s (used DPI=%s)" % (self.dndpi.sizex, self.dndpi.sizey, self.final_dpi)
             print "The XML expects images to be in %s" % self.imdir
             print "="*70
+
+    def cleanup_old_solution_image_files(self):
+        '''
+        Delete old solution image files, if present
+        '''
+        old_solimfn_pat = path(self.outdir) / (self.fnpre + '_dnd_sol_??????.png')
+        print "pat=%s" % old_solimfn_pat
+        old_sol_image_files = list(glob.glob(old_solimfn_pat))
+        if old_sol_image_files:
+            if self.verbose:
+                print "[latex2dnd] Cleaning up by removing %d old files:" % (len(old_sol_image_files))
+            for fn in old_sol_image_files:
+                os.unlink(fn)
+                print "            Removed %s" % fn
 
     def generate_dnd_xml(self):
         xmlfn = self.fnpre + '_dnd.xml'
@@ -713,6 +737,11 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
                       dest="output_tex",
                       default=False,
                       help="Final output should be a tex file (works when input is a *.dndspec file)",)
+    parser.add_option("--cleanup",
+                      action="store_true",
+                      dest="do_cleanup",
+                      default=False,
+                      help="Remove old solution image files, and tmp.pdf",)
 
     if not opts:
         (opts, args) = parser.parse_args(arglist)
@@ -736,6 +765,7 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
                           imverbose=opts.very_verbose,
                           can_reuse=opts.can_reuse,
                           custom_cfn=opts.custom_cfn,
+                          do_cleanup=opts.do_cleanup,
     )
     if return_object:
         return l2d
