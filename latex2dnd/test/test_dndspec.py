@@ -46,7 +46,8 @@ class TestDNDspec(unittest.TestCase):
             print "checking png"
             self.assertIn('<img src="/static/images/gravity_simple/gravity_simple_dnd_sol.png"/>', xml)
             print "checking samples"
-            self.assertIn("samples = 'G,m1,m2,R@1,1,1,1:20,20,20,20#20'", xml)
+            # self.assertIn("samples = 'G,m1,m2,R@1,1,1,1:20,20,20,20#20'", xml)
+            self.assertIn("samples = 'R,m1,G,m2@1,1,1,1:20,20,20,20#20'", xml)
 
 if __name__ == '__main__':
     unittest.main()

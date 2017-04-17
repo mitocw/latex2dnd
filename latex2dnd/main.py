@@ -717,7 +717,7 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
     fn = args[0]
 
     if fn.endswith(".dndspec"):
-        s2t = DNDspec2tex(fn, output_tex=opts.output_tex, verbose=opts.verbose)
+        s2t = DNDspec2tex(fn, verbose=opts.verbose)
         if opts.output_tex:
             sys.exit(0)
         fn = s2t.tex_filename
