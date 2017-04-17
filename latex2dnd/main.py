@@ -25,6 +25,8 @@ import sys
 import re
 import json
 import optparse
+import random
+import string
 try:
     from path import path
 except:
@@ -267,7 +269,7 @@ class LatexToDragDrop(object):
     '''
     
     def __init__(self, texfn, compile=True, verbose=True, dpi=300, imverbose=False, outdir='.',
-                 can_reuse=False, custom_cfn=None):
+                 can_reuse=False, custom_cfn=None, randomize_solution_filename=True):
         '''
         texfn = *.tex filename
         '''
@@ -309,6 +311,10 @@ class LatexToDragDrop(object):
         self.dpi = dpi
         self.load_boxes()
         self.load_dnd()
+
+        if randomize_solution_filename:
+            randkey = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+            self.solimfn = outdir / (self.fnpre + '_dnd_sol_%s.png' % randkey)
 
         # by convention, page 1 has the main drag-and-drop image,
         # and page 2 has the labels, in individual boxes.
