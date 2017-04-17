@@ -50,7 +50,9 @@ Options:
 Example
 -------
 
-Get quadratic.tex from the latex2dnd/testtex directory, and run this:
+See [https://github.com/mitocw/latex2dnd/tree/master/examples](examples directory).
+
+Or: get quadratic.tex from the latex2dnd/testtex directory, and run this:
 
   latex2dnd quadratic.tex -r 220 -v
 
@@ -217,10 +219,15 @@ More formally:
     DISTRACTOR_LABELS: <comma separated list of labels to be shown as draggables>
     ALL_LABELS: <comma separated list of MATCH and DISTRACTOR labels, in desired order, to be shown as draggables>
     BEGIN_EXPRESSION
-          <latex expression containing MATCH labels>
+          <latex expression containing MATCH labels, with spaces around every label>
     END_EXPRESSION
-    CHECK_FORMULA: <text representation of correct formula, using MATCH labels, to be used for checking>
+    CHECK_FORMULA: <text representation of correct formula, using math expression version of the MATCH labels, to be used for checking>
     CHECK_FORMULA_BOXES: <formula using [#], where [#] is the MATCH label number; needed if MATCH labels appear in more than one input box>
+    TEST_CORRECT: formula which should evaluate to being correct
+    TEST_INCORRECT: formula which should evaluate to being incorrect
+    BOX_HEIGHT: draggable label box height to use
+    BOX_WIDTH: draggable label box width to use
+    EXTRA_HEADER_TEX: a line with extra latex commands to be inserted into the header (may be used multiple times)
 
 There should be no leading spaces / indentation on lines with keywords (like MATCH_LABELS).
 
@@ -229,13 +236,13 @@ Advanced usage
 
 Here are some additional useful macros:
 
-\DDoptions{} -- extra configuration parameters, e.g. HIDE_FORMULA_INPUT, CAN_REUSE, and ALLOW_EMPTY
+`\DDoptions{}` -- extra configuration parameters, e.g. HIDE_FORMULA_INPUT, CAN_REUSE, and ALLOW_EMPTY
 
-\DDformula{ pattern }{ samples }{ expected } -- use formula checking to test correctness of drag-and-drop response.  For example:
+`\DDformula{ pattern }{ samples }{ expected }` -- use formula checking to test correctness of drag-and-drop response.  For example:
 
     \DDformula{ [1] * [2] * [3] / [4] }{ G,m_1,m_2,d@1,1,1,1:20,20,20,20\#40 }{G*m_1*m_2/d^2}{}
 
-\DDtest{ correct | incorrect }{ answer_box_ids }{ draggable_ids } -- unit test to perform on DDformula expressions, e.g.
+`\DDtest{ correct | incorrect }{ answer_box_ids }{ draggable_ids }` -- unit test to perform on DDformula expressions, e.g.
 
     \DDtest{correct}{1,2,3,4}{G,m2,m1,d2}
     \DDtest{incorrect}{1,2,3,4}{G,d2,m1,m2}
