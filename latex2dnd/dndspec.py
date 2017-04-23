@@ -62,8 +62,8 @@ class DNDlabel(object):
                                                                                                   self.ltype)
 
         self.ddlabel = "\\DDlabel[%s]{%s}{$%s$}" % (self.math_exp, self.draggable_label, self.tex)
-        self.formula_box = " ([%s]) " % self.index
-        self.ddboxes = {}	# key=index, val=ddbox string; first one uses self.index
+        self.formula_box = [ ]
+        self.ddboxes = OrderedDict()	# key=index, val=ddbox string; first one uses self.index
 
     def make_math_variable(self):
         '''
@@ -74,7 +74,11 @@ class DNDlabel(object):
            - exponents should not generate additional variables (eg x^2 --> variable "x")
            - simple math functions should not generate variables (TODO)
         '''
-        m = re.match('[0-9]+', self.math_exp)
+        m = re.match('[0-9\.]+', self.math_exp)	# positive numbers
+        if m:
+            self.math_variable = None
+            return
+        m = re.match('\-[0-9\.]+', self.math_exp)	# negative numbers
         if m:
             self.math_variable = None
             return
@@ -98,6 +102,9 @@ class DNDlabel(object):
         return new_index
 
     def make_ddbox(self, nwidth=1):
+        '''
+        This needs to be called when a label appears inside an expression.
+        '''
         bwidth = "B" * nwidth
         if len(self.ddboxes)==0:
             index = self.index
@@ -107,6 +114,7 @@ class DNDlabel(object):
                 print "[dndspec] generating new box index %d for label %s" % (index, self.tex)
         ddbox = " \\DD%s{%d}{%s} " % (bwidth, index, self.draggable_label)
         self.ddboxes[index] = ddbox
+        self.formula_box.append( " ([%s]) " % index  )	# boxed expression for formulas
         return ddbox
 
     def make_math_exp(self, tex):
@@ -382,13 +390,29 @@ class DNDspec2tex(object):
     def formula_to_boxed(self, formula, labelset=None, exit_on_failure=True, missing_ok=False):
         '''
         Convert a text math formula to one with index boxed [#] for each identified expression.
+        If an expression appears more than once, then use the corresponding additional (already
+        defined) DDBox index numbers.
         '''
         labelset = labelset or self.match_labels
         for label in labelset:
             lobj = self.label_objs[label]
             labre = "\s%s\s" % self.escape_regexp(lobj.math_exp)
-            (formula, nmatch) = re.subn(labre, lobj.formula_box, formula)
-            if not nmatch and (not missing_ok):
+            n_matches = 0
+            index = 0
+            while re.search(labre, formula):
+                if index==0 and len(lobj.formula_box)==0:
+                    lobj.make_ddbox()	# every label object should have a default box index [#], if not, make it
+                if index < len(lobj.formula_box):
+                    box = lobj.formula_box[index]
+                else:
+                    msg = "--> [dndspec] Error! %d matches already found for %s in formula %s, but just found another?" % (n_matches, label, formula)
+                    print "    label math expression = %s" % labre
+                    print msg
+                    raise Exception(msg)
+                (formula, nmatch) = re.subn(labre, box, formula, count=1)
+                n_matches += nmatch
+                index += 1
+            if not n_matches and (not missing_ok):
                 msg = "--> [dndspec] WARNING: no matching math expression found for '%s' (%s) in formula" % (label, lobj.math_exp)
                 print msg
                 print "    formula = %s" % formula
