@@ -90,11 +90,14 @@ class DNDlabel(object):
         if m:
             self.math_variable = m.group(1)
             return
-        m = re.match('-*([a-zA-Z]+[0-9]*)', self.math_exp)	# negated variable, or variable
+        m = re.match('-*([a-zA-Z]+[0-9]*)$', self.math_exp)	# negated variable, or variable
         if m:
             self.math_variable = m.group(1)
             return
-        self.math_variable = self.math_exp
+        m = re.match('([A-Za-z]+)_([0-9]+)', self.math_exp)	# numerical subscript, e.g. m_1
+        if m:
+            self.math_variable = self.math_exp
+            return
 
     def get_new_index(self):
         '''
@@ -131,6 +134,9 @@ class DNDlabel(object):
         m = re.match('([A-Za-z]+)\^\{([0-9]+)\}', tex)	# numerical exponent, e.g. d^{2}
         if m:
             return "%s^%s" % (m.group(1), m.group(2))
+        m = re.match('([A-Za-z]+)_\{*([0-9]+)\}*', tex)	# numerical subscript, e.g. m_1
+        if m:
+            return "%s_%s" % (m.group(1), m.group(2))
 
         expr = ""
         idx = 0
@@ -463,7 +469,7 @@ class DNDspec2tex(object):
 
         varlist = [ self.label_objs[label].math_variable for label in self.all_labels]
         varlist = [x for x in varlist if x is not None]	# remove None
-        varlist = set(varlist)	# remove duplicates
+        varlist = list(OrderedDict.fromkeys(varlist))	# remove duplicates
         self.formula_variables = ','.join(list(varlist))
         self.formula_nsamples = 20
         nvar = len(varlist)
@@ -474,6 +480,7 @@ class DNDspec2tex(object):
             print "          Using %d variables: %s" % (nvar, self.formula_variables)
             print "          And taking %d samples" % (self.formula_nsamples)
 
+        self.varlist = varlist
         self.dd_formula = "\\DDformula{ %s }{ %s }{ %s }{}" % (self.check_formula_boxes,
                                                                self.formula_samples,
                                                                self.math_check_formula)
@@ -583,6 +590,13 @@ def test_dndlabel5():
     assert ddl.math_exp=="d^2"
     assert ddl.math_variable=="d"
     assert ddl.draggable_label == "dtwo"
+                                 
+def test_dndlabel6():
+    ddl = DNDlabel("m_1", index_set={}, draggable_label_set={}, ltype="match")
+    print "math_exp for m_1 = %s" % ddl.math_exp
+    assert ddl.math_exp=="m_1"
+    assert ddl.math_variable=="m_1"
+    assert ddl.draggable_label == "mone"
     
 def test_dndspec1():
     tex = r"""MATCH_LABELS: -\pi, B^\prime, d^2, v
@@ -602,7 +616,7 @@ TEST_CORRECT: -pi * ( d^2 * Bprime ) / ( v )
     contents = str(ofp.getvalue())
     print contents
     assert( r'\DDtest{correct}{1,2,3,4}{minuspi,dtwo,Bprime,v}' in contents)
-    assert( r'\DDformula{  ([1]) * ( ([2]) * ([3]) ) / ( ([4]) )  }{ Bprime,pi,d,v@1,1,1,1:20,20,20,20\#20 }{  -pi * ( Bprime * d^2 ) / ( v )  }{}' in contents)    
+    assert( r'\DDformula{  ([1]) * ( ([2]) * ([3]) ) / ( ([4]) )  }{ pi,v,d,Bprime@1,1,1,1:20,20,20,20\#20 }{  -pi * ( Bprime * d^2 ) / ( v )  }{}' in contents)    
     assert( r'P =\exp\left( \DDB{1}{minuspi} \mu \frac{ \DDB{2}{Bprime} \DDB{3}{dtwo} }{ \DDB{4}{v} \hbar } \right)' in contents)
     assert( r'\DDlabel[Bprime]{Bprime}{$B^\prime$}' in contents)
 
@@ -628,3 +642,40 @@ CHECK_FORMULA: 2 * v / ( mu * Bprime )
         pass
     print str(err)
     assert "WARNING: no matching label 'mu' found" in str(err)
+
+def test_dndspec3():
+    # ensure variable order is maintained in samples (for test stability)
+    tex = r"""
+MATCH_LABELS: G,m_1,m_2,R
+BEGIN_EXPRESSION
+\bea
+	\frac{ G m_1 m_2 }{ R }
+\nonumber
+\eea
+END_EXPRESSION
+CHECK_FORMULA: G * m_1 * m_2 / R
+"""
+    from StringIO import StringIO
+    ofp = StringIO()
+    err = ''
+    dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
+    assert dst.varlist==['G', 'm_1', 'm_2', 'R']
+
+def test_dndspec4():
+    # ensure powers of variables do not lead to more variables to be sampled
+    tex = r"""
+MATCH_LABELS: G,m_1,m_2,R
+ALL_LABELS: G,G^2, m_1,m_2,R, R^2
+BEGIN_EXPRESSION
+\bea
+	\frac{ G m_1 m_2 }{ R }
+\nonumber
+\eea
+END_EXPRESSION
+CHECK_FORMULA: G * m_1 * m_2 / R
+"""
+    from StringIO import StringIO
+    ofp = StringIO()
+    err = ''
+    dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
+    assert dst.varlist==['G', 'm_1', 'm_2', 'R']
