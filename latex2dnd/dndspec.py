@@ -82,11 +82,15 @@ class DNDlabel(object):
         if m:
             self.math_variable = None
             return
-        m = re.match('-*([a-zA-Z]+[0-9]*)\^([0-9]+)', self.math_exp)
+        m = re.match('[0-9]+/[0-9]+', self.math_exp)	# numerical fractions
+        if m:
+            self.math_variable = None
+            return
+        m = re.match('-*([a-zA-Z]+[0-9]*)\^([0-9]+)', self.math_exp)	# exponentiated variable
         if m:
             self.math_variable = m.group(1)
             return
-        m = re.match('-*([a-zA-Z]+[0-9]*)', self.math_exp)
+        m = re.match('-*([a-zA-Z]+[0-9]*)', self.math_exp)	# negated variable, or variable
         if m:
             self.math_variable = m.group(1)
             return
@@ -120,6 +124,14 @@ class DNDlabel(object):
     def make_math_exp(self, tex):
         if all([ x in string.letters or x in string.digits for x in tex]):
             return tex
+
+        m = re.match('\\\\frac\{([0-9]+)}\{([0-9])+}', tex)	# numerical fractions, e.g. \frac{1}{2} -> 1/2
+        if m:
+            return "%s/%s" % (m.group(1), m.group(2))
+        m = re.match('([A-Za-z]+)\^\{([0-9]+)\}', tex)	# numerical exponent, e.g. d^{2}
+        if m:
+            return "%s^%s" % (m.group(1), m.group(2))
+
         expr = ""
         idx = 0
         replp = {'+': 'plus',
@@ -435,7 +447,15 @@ class DNDspec2tex(object):
         self.math_check_formula = self.check_formula
         for label in self.match_labels:
             lobj = self.label_objs[label]
-            self.math_check_formula = re.sub("\s%s\s" % label, ' ' + lobj.math_exp + ' ', self.math_check_formula)
+            labre = self.escape_regexp("\s%s\s" % label)
+            try:
+                self.math_check_formula = re.sub(labre, ' ' + lobj.math_exp + ' ', self.math_check_formula)
+            except Exception as err:
+                msg = "[dndspec] Failed to make instructor formula expression, label=%s, math_exp=%s, formula=%s" % (labre,
+                                                                                                                     lobj.math_exp,
+                                                                                                                     self.math_check_formula)
+                print msg
+                raise Exception(msg)
 
         # make check formula boxes if one not provided
         if not self.check_formula_boxes:
@@ -539,7 +559,7 @@ class DNDspec2tex(object):
 # unit tests
 
 def test_dndlabel1():
-    ddl = DNDlabel("-\pi", index_set={}, draggable_label_set={}, ltype="match")
+    ddl = DNDlabel(r"-\pi", index_set={}, draggable_label_set={}, ltype="match")
     assert ddl.math_exp=="-pi"
     assert ddl.draggable_label == "minuspi"
     
@@ -549,9 +569,20 @@ def test_dndlabel2():
     assert ddl.draggable_label == "minustwo"
                                  
 def test_dndlabel3():
-    ddl = DNDlabel("- \pi", index_set={}, draggable_label_set={}, ltype="match")
+    ddl = DNDlabel(r"- \pi", index_set={}, draggable_label_set={}, ltype="match")
     assert ddl.math_exp=="minuspi"
     assert ddl.draggable_label == "minuspi"
+                                 
+def test_dndlabel4():
+    ddl = DNDlabel(r"\frac{1}{2}", index_set={}, draggable_label_set={}, ltype="match")
+    assert ddl.math_exp=="1/2"
+    assert ddl.draggable_label == "fraconetwo"
+                                 
+def test_dndlabel5():
+    ddl = DNDlabel("d^{2}", index_set={}, draggable_label_set={}, ltype="match")
+    assert ddl.math_exp=="d^2"
+    assert ddl.math_variable=="d"
+    assert ddl.draggable_label == "dtwo"
     
 def test_dndspec1():
     tex = r"""MATCH_LABELS: -\pi, B^\prime, d^2, v
@@ -571,7 +602,7 @@ TEST_CORRECT: -pi * ( d^2 * Bprime ) / ( v )
     contents = str(ofp.getvalue())
     print contents
     assert( r'\DDtest{correct}{1,2,3,4}{minuspi,dtwo,Bprime,v}' in contents)
-    assert( r'\DDformula{  ([1]) * ( ([2]) * ([3]) ) / ( ([4]) )  }{ d,Bprime,v,zzz,-pi@1,1,1,1,1:20,20,20,20,20\#20 }{  -pi * ( Bprime * d^2 ) / ( v )  }{}' in contents)    
+    assert( r'\DDformula{  ([1]) * ( ([2]) * ([3]) ) / ( ([4]) )  }{ Bprime,pi,d,v@1,1,1,1:20,20,20,20\#20 }{  -pi * ( Bprime * d^2 ) / ( v )  }{}' in contents)    
     assert( r'P =\exp\left( \DDB{1}{minuspi} \mu \frac{ \DDB{2}{Bprime} \DDB{3}{dtwo} }{ \DDB{4}{v} \hbar } \right)' in contents)
     assert( r'\DDlabel[Bprime]{Bprime}{$B^\prime$}' in contents)
 
