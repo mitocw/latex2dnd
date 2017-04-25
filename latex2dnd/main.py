@@ -757,7 +757,11 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
     fn = args[0]
 
     if fn.endswith(".dndspec"):
-        s2t = DNDspec2tex(fn, verbose=opts.verbose)
+        try:
+            s2t = DNDspec2tex(fn, verbose=opts.verbose)
+        except Exception as err:
+            print "[latex2dnd] Failed to run dndspec2tex on input file %s, err=%s" % (fn, err)
+            raise
         if opts.output_tex:
             sys.exit(0)
         fn = s2t.tex_filename

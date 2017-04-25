@@ -86,7 +86,11 @@ class DNDlabel(object):
         if m:
             self.math_variable = None
             return
-        m = re.match('-*([a-zA-Z]+[0-9]*)\^([0-9]+)', self.math_exp)	# exponentiated variable
+        m = re.match('([A-Za-z]+)_\{*([0-9]+)\}*\^\{*([0-9]+)\}*$', self.math_exp)	# numerical subscript and exponent, e.g. d_1^{2}
+        if m:
+            self.math_variable = "%s_%s" % (m.group(1), m.group(2))
+            return
+        m = re.match('-*([a-zA-Z]+[0-9]*)\^([0-9]+)$', self.math_exp)	# exponentiated variable
         if m:
             self.math_variable = m.group(1)
             return
@@ -94,7 +98,7 @@ class DNDlabel(object):
         if m:
             self.math_variable = m.group(1)
             return
-        m = re.match('([A-Za-z]+)_([0-9]+)', self.math_exp)	# numerical subscript, e.g. m_1
+        m = re.match('([A-Za-z]+)_([0-9]+)$', self.math_exp)	# numerical subscript, e.g. m_1
         if m:
             self.math_variable = self.math_exp
             return
@@ -128,13 +132,16 @@ class DNDlabel(object):
         if all([ x in string.letters or x in string.digits for x in tex]):
             return tex
 
-        m = re.match('\\\\frac\{([0-9]+)}\{([0-9])+}', tex)	# numerical fractions, e.g. \frac{1}{2} -> 1/2
+        m = re.match('\\\\frac\{([0-9]+)}\{([0-9])+}$', tex)	# numerical fractions, e.g. \frac{1}{2} -> 1/2
         if m:
             return "%s/%s" % (m.group(1), m.group(2))
-        m = re.match('([A-Za-z]+)\^\{([0-9]+)\}', tex)	# numerical exponent, e.g. d^{2}
+        m = re.match('([A-Za-z]+)_\{*([0-9]+)\}*\^\{*([0-9]+)\}*$', tex)	# numerical subscript and exponent, e.g. d_1^{2}
+        if m:
+            return "%s_%s^%s" % (m.group(1), m.group(2), m.group(3))
+        m = re.match('([A-Za-z]+)\^\{*([0-9]+)\}*$', tex)	# numerical exponent, e.g. d^{2}
         if m:
             return "%s^%s" % (m.group(1), m.group(2))
-        m = re.match('([A-Za-z]+)_\{*([0-9]+)\}*', tex)	# numerical subscript, e.g. m_1
+        m = re.match('([A-Za-z]+)_\{*([0-9]+)\}*$', tex)	# numerical subscript, e.g. m_1
         if m:
             return "%s_%s" % (m.group(1), m.group(2))
 
@@ -597,6 +604,20 @@ def test_dndlabel6():
     assert ddl.math_exp=="m_1"
     assert ddl.math_variable=="m_1"
     assert ddl.draggable_label == "mone"
+                                 
+def test_dndlabel6():
+    ddl = DNDlabel("E_0^2", index_set={}, draggable_label_set={}, ltype="match")
+    print "math_exp for E_0^2 = %s" % ddl.math_exp
+    assert ddl.math_exp=="E_0^2"
+    assert ddl.math_variable=="E_0"
+    assert ddl.draggable_label == "Ezerotwo"
+                                 
+def test_dndlabel7():
+    ddl = DNDlabel("\mu_0", index_set={}, draggable_label_set={}, ltype="match")
+    print "math_exp for \mu_0 = %s" % ddl.math_exp
+    assert ddl.math_exp=="mu0"
+    assert ddl.math_variable=="mu0"
+    assert ddl.draggable_label == "muzero"
     
 def test_dndspec1():
     tex = r"""MATCH_LABELS: -\pi, B^\prime, d^2, v
