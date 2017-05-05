@@ -94,7 +94,7 @@ class DNDlabel(object):
         if m:
             self.math_variable = m.group(1)
             return
-        m = re.match('-*([a-zA-Z]+[0-9]*)$', self.math_exp)	# negated variable, or variable
+        m = re.match('-*([a-zA-Z0-9]+)$', self.math_exp)	# negated variable, or variable
         if m:
             self.math_variable = m.group(1)
             return
@@ -722,3 +722,23 @@ CHECK_FORMULA: G * m12 * m_2 / R
     err = ''
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
     assert dst.varlist==['G', 'm12', 'm_2', 'R']
+
+def test_dndspec6():
+    # ensure math variables with numbers inbetween letters work properly
+    tex = r"""
+BOX_WIDTH: 12ex
+% DELIMETER: ;
+MATCH_LABELS: \frac{1}{\lambda_j}, \omega_j^{{2}}(0), \omega_j^{{2}}(t), \lambda_j
+ALL_LABELS: \omega_j^{{2}}(0), \omega_j^{{2}}(t), \omega_j(0), \omega_j(t), \lambda_j, \lambda_j^2, \frac{1}{\lambda_j}, \frac{1}{\lambda_j^2}
+BEGIN_EXPRESSION
+\bea
+ \ddot{\lambda_j} &= \frac{1}{\lambda_j} \frac{ \omega_j^{{2}}(0) }{\lambda_1\lambda_2\lambda_3}- \omega_j^{{2}}(t) \lambda_j 
+\eea
+END_EXPRESSION
+CHECK_FORMULA: frac1lambdaj * omegaj20 + omegaj2t * lambdaj
+"""
+    from StringIO import StringIO
+    ofp = StringIO()
+    err = ''
+    dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
+    assert dst.varlist==['omegaj20', 'omegaj2t', 'zzz', 'lambdaj', 'frac1lambdaj']
