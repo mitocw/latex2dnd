@@ -245,6 +245,7 @@ class DNDspec2tex(object):
         self.expression = ""
         self.check_formula = None
         self.check_formula_boxes = None
+        self.label_delimeter = ","	# default is that MATCH_LABELS and ALL_LABELS are delimited by a comma
         self.comments = ""
         self.extra_header_tex = ""
         self.formula_tests = []		# list of dicts specifying tests
@@ -258,7 +259,7 @@ class DNDspec2tex(object):
             lines = input_tex.split('\n')
 
         def splitstr(s):
-            return [x.strip() for x in s.split(',')]
+            return [x.strip() for x in s.split(self.label_delimeter)]
             
         def space_pad(s):
             return ' ' + s + ' '
@@ -273,6 +274,7 @@ class DNDspec2tex(object):
 
         keyword_table = {'BOX_WIDTH': {'field': 'box_width', 'func': None},
                          'BOX_HEIGHT': {'field': 'box_height', 'func': None},
+                         'DELIMETER': {'field': 'label_delimeter', 'func': None},
                          'EXTRA_HEADER_TEX': {'field': 'extra_header_tex', 'func': None},
                          'MATCH_LABELS': {'field': 'match_labels', 'func': splitstr},
                          'DISTRACTOR_LABELS': {'field': 'distractor_labels', 'func': splitstr, 'add': True},
@@ -700,3 +702,23 @@ CHECK_FORMULA: G * m_1 * m_2 / R
     err = ''
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
     assert dst.varlist==['G', 'm_1', 'm_2', 'R']
+
+def test_dndspec5():
+    # ensure ability to change delimeters, so labels may have commas
+    tex = r"""
+DELIMETER: ;
+MATCH_LABELS: G; m_{1,2}; m_2; R
+ALL_LABELS: G; G^2; m_{1,2}; m_2; R; R^2
+BEGIN_EXPRESSION
+\bea
+	\frac{ G m_{1,2} m_2 }{ R }
+\nonumber
+\eea
+END_EXPRESSION
+CHECK_FORMULA: G * m12 * m_2 / R
+"""
+    from StringIO import StringIO
+    ofp = StringIO()
+    err = ''
+    dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
+    assert dst.varlist==['G', 'm12', 'm_2', 'R']
