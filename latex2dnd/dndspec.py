@@ -361,6 +361,12 @@ class DNDspec2tex(object):
                 cnt += 1
                 label_objs[label] = make_label(label, cnt, "distractor")
                 
+        # double-check that all match_labels are in all_labels
+        for label in self.match_labels:
+            if not label in self.all_labels:
+                msg = "Error in dndspec: label '%s' is in MATCH_LABELS but is missing from ALL_LABELS!" % label
+                raise Exception(msg)
+
         # generate \DDlabel[math_exp]{draggable_label}{label_tex} for each label
         # label_tex is the tex for the label, specified in LABELS
         ltex = [ label_objs[label].ddlabel for label in self.all_labels ]
@@ -742,3 +748,26 @@ CHECK_FORMULA: frac1lambdaj * omegaj20 + omegaj2t * lambdaj
     err = ''
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
     assert dst.varlist==['omegaj20', 'omegaj2t', 'zzz', 'lambdaj', 'frac1lambdaj']
+
+def test_dndspec6():
+    # ensure error is thrown if label in MATCH_LABELS is not in ALL_LABELS
+    tex = r"""
+MATCH_LABELS: a, b
+ALL_LABELS: a, c, f, g
+BEGIN_EXPRESSION
+\bea
+ a + b 
+\eea
+END_EXPRESSION
+"""
+    from StringIO import StringIO
+    ofp = StringIO()
+    err = ''
+    the_err = ""
+    try:
+        dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
+    except Exception as err:
+        the_err = str(err)
+
+    assert "in MATCH_LABELS but is missing from ALL_LABELS" in the_err
+    
