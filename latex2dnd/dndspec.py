@@ -90,11 +90,11 @@ class DNDlabel(object):
         if m:
             self.math_variable = "%s_%s" % (m.group(1), m.group(2))
             return
-        m = re.match('-*([a-zA-Z]+[0-9]*)\^([0-9]+)$', self.math_exp)	# exponentiated variable
+        m = re.match('-*([a-zA-Z]+[a-zA-Z0-9]*)\^([0-9]+)$', self.math_exp)	# exponentiated variable
         if m:
             self.math_variable = m.group(1)
             return
-        m = re.match('-*([a-zA-Z0-9]+)$', self.math_exp)	# negated variable, or variable
+        m = re.match('-*([a-zA-Z]+[a-zA-Z0-9]*)$', self.math_exp)	# negated variable, or variable
         if m:
             self.math_variable = m.group(1)
             return
@@ -770,4 +770,30 @@ END_EXPRESSION
         the_err = str(err)
 
     assert "in MATCH_LABELS but is missing from ALL_LABELS" in the_err
+    
+
+def test_dndspec7():
+    # ensure variables include alpha+(mixed alpha numbers)
+    tex = r"""
+BOX_WIDTH: 14ex
+% DELIMETER: ;
+MATCH_LABELS: \frac{1}{\kappa^2}, \kappa^2, -\frac{1}{\kappa^3}
+ALL_LABELS: -\frac{1}{\kappa^2}, \frac{1}{\kappa^2}, -\kappa, \kappa, -\kappa^2, \kappa^2, -\frac{1}{\kappa^3}, \frac{1}{\kappa^3}
+BEGIN_EXPRESSION
+\bea
+        \epsilon &= \frac{3}{4} \left[ \frac{1}{\kappa^2} \right] +\frac{3}{4} \left[ \kappa^2 \right]
+                        +\frac{\eta}{\sqrt{2\pi}} \left[ -\frac{1}{\kappa^3} \right]
+\nonumber
+\eea
+END_EXPRESSION
+CHECK_FORMULA: frac1kappa^2 + kappa^2 + 9 * ( -frac1kappa^3 )
+TEST_CORRECT: kappa^2 + frac1kappa^2 + 9 * ( -frac1kappa^3 )
+"""
+    from StringIO import StringIO
+    ofp = StringIO()
+    err = ''
+    the_err = ""
+    dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
+    assert dst.varlist==['frac1kappa', 'kappa']
+
     
