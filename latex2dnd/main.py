@@ -633,7 +633,12 @@ class LatexToDragDrop(object):
                         key = option.lower().strip()
                         val = True
                     if self.options.get(key, None) is not None:
-                        print "  %s already fixed by command-line option: using that to override \DDoptions %s" % (key, option)
+                        # EVH: Allow CAN_REUSE in DND tex file to redefine
+                        #      comman line option default value of false
+                        if key.lower() == 'can_reuse':
+                            self.options[key] = val
+                        else:
+                            print "  %s already fixed by command-line option: using that to override \DDoptions %s" % (key, option)
                     else:
                         self.options[key] = val
                  # print "OPTIONS = ", self.options
