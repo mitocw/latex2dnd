@@ -510,10 +510,18 @@ class LatexToDragDrop(object):
         The image from latex has solutions in it.  We white-out the
         boxes to make the dnd image.
         '''
-        self.final_dpi = self.dpi
+        if 'max' in self.dpi:
+            self.final_dpi = 300
+        else:
+            self.final_dpi = self.dpi
+        
+        m = re.match("max([0-9]+)", self.dpi)	# if dpi=max200 then let 200 be the starting dpi value, but autoscale smaller to fit
+        if m:
+            self.final_dpi = m.group(1)
+            self.dpi = "max"
+            
         if self.dpi=="max":
             # automatically set DPI by limiting image width to max_image_width
-            self.final_dpi = 300
             self.dndpi = PageImage(self.pdffn, page=1, imfn=self.solimfn, dpi=self.final_dpi, verbose=self.imverbose)            
             if self.dndpi.sizex > self.max_image_width:
                 print "[latex2dnd] Page width %d exceeds max=%s at dpi=%s" % (self.dndpi.sizex, self.max_image_width, self.final_dpi)

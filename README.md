@@ -264,7 +264,9 @@ to white out solution boxes and generate the problem image.  Version
 "-region", causing the region specification to be ignored, and thus
 producing blank problem images (everything whited out).  If you
 encounter this problem, one workaround is to back out to version 6.9.1
-of imagemagick.
+of imagemagick.  For example, under OSX with homebrew, do:
+
+    brew switch imagemagick 6.9.1-10
 
 History
 -------
