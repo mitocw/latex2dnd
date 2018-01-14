@@ -60,6 +60,8 @@ class PageImage(object):
         if verbose:
             print cmd
         os.system(cmd)
+        if not os.path.exists("tmp.pdf"):
+            raise Exception("===> [latex2dnd] error running pdfseparate, command: %s" % cmd)
 
         # crop the file, verbosely, to get the bounding box
         cmd = 'pdfcrop --verbose tmp.pdf %s' % (pdfimfn)
@@ -129,6 +131,8 @@ class PageImage(object):
         if self.verbose:
             print cmd
         os.system(cmd)
+        if not os.path.exists(outfn):
+            raise Exception("===> [latex2dnd] error running convert, command: %s" % cmd)
         
     def WhiteBox(self, boxes, outfn=None):
         '''
@@ -155,6 +159,8 @@ class PageImage(object):
         if self.verbose:
             print cmd
         os.system(cmd)
+        if not os.path.exists(outfn):
+            raise Exception("===> [latex2dnd] error running convert, command: %s" % cmd)
 
     def ExtractBox(self, box, outfn=None):
         '''
@@ -173,6 +179,8 @@ class PageImage(object):
         if self.verbose:
             print cmd
         os.system(cmd)
+        if not os.path.exists(outfn):
+            raise Exception("===> [latex2dnd] error running convert, command: %s" % cmd)
 
         
 class Box(object):
@@ -270,7 +278,8 @@ class LatexToDragDrop(object):
     '''
     
     def __init__(self, texfn, compile=True, verbose=True, dpi=300, imverbose=False, outdir='.',
-                 can_reuse=False, custom_cfn=None, randomize_solution_filename=True, do_cleanup=False):
+                 can_reuse=False, custom_cfn=None, randomize_solution_filename=True, do_cleanup=False,
+                 interactionmode=None):
         '''
         texfn = *.tex filename
         '''
@@ -283,9 +292,12 @@ class LatexToDragDrop(object):
                 print "Adding %s to TEXINPUTS" % texpath
                 print "Running latex twice"
                 print "-"*77
+            imstr = ""
+            if interactionmode:
+                imstr = "-interaction=%s" % interactionmode
             # run pdflatex TWICE
-            os.system('pdflatex %s' % texfn)
-            os.system('pdflatex %s' % texfn)
+            for k in range(2):
+                os.system('pdflatex %s %s' % (imstr, texfn))
             if verbose:
                 print "="*77
 
@@ -510,15 +522,16 @@ class LatexToDragDrop(object):
         The image from latex has solutions in it.  We white-out the
         boxes to make the dnd image.
         '''
-        if 'max' in self.dpi:
+        if type(self.dpi) in [str, unicode] and ('max' in self.dpi):
             self.final_dpi = 300
         else:
             self.final_dpi = self.dpi
         
-        m = re.match("max([0-9]+)", self.dpi)	# if dpi=max200 then let 200 be the starting dpi value, but autoscale smaller to fit
-        if m:
-            self.final_dpi = m.group(1)
-            self.dpi = "max"
+        if type(self.dpi) in [str, unicode]:
+            m = re.match("max([0-9]+)", self.dpi)	# if dpi=max200 then let 200 be the starting dpi value, but autoscale smaller to fit
+            if m:
+                self.final_dpi = m.group(1)
+                self.dpi = "max"
             
         if self.dpi=="max":
             # automatically set DPI by limiting image width to max_image_width

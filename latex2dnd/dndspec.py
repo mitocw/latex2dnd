@@ -283,6 +283,8 @@ class DNDspec2tex(object):
                          'CHECK_FORMULA_BOXES': {'field': 'check_formula_boxes', 'func': space_pad},
                          'TEST_CORRECT': {'field': 'formula_tests', 'func': make_test_correct, 'append': True},
                          'TEST_INCORRECT': {'field': 'formula_tests', 'func': make_test_incorrect, 'append': True},
+                         'NAME': {'field': 'dnd_name', 'func': None},
+                         'TITLE': {'field': 'dnd_title', 'func': None},
         }
 
         cnt = 0
