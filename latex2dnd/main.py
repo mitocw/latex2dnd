@@ -279,17 +279,26 @@ class LatexToDragDrop(object):
     
     def __init__(self, texfn, compile=True, verbose=True, dpi=300, imverbose=False, outdir='.',
                  can_reuse=False, custom_cfn=None, randomize_solution_filename=True, do_cleanup=False,
+                 command_line_options_override=True,
                  interactionmode=None):
         '''
         texfn = *.tex filename
+
+        command_line_options_override = (bool) True if provided parameers should override whatever is specified in the tex or dndspec file
         '''
+        self.command_line_options_override = command_line_options_override
         if compile:
             # set the TEXINPUTS path
             mydir = os.path.dirname(__file__)
+            oldti = os.environ['TEXINPUTS']
             texpath = os.path.abspath(mydir + '/tex')
-            os.environ['TEXINPUTS'] = "::%s" % texpath
+            newti = "::%s" % texpath
+            if oldti:
+                newti += ":" + oldti
+            os.environ['TEXINPUTS'] = newti
+                
             if verbose:
-                print "Adding %s to TEXINPUTS" % texpath
+                print "Setting TEXINPUTS=%s" % os.environ['TEXINPUTS']
                 print "Running latex twice"
                 print "-"*77
             imstr = ""
@@ -653,8 +662,8 @@ class LatexToDragDrop(object):
                     else:
                         key = option.lower().strip()
                         val = True
-                    if self.options.get(key, None) is not None:
-                        print "  %s already fixed by command-line option: using that to override \DDoptions %s" % (key, option)
+                    if self.options.get(key, None) is not None and self.command_line_options_override:
+                        print "  %s=%s already fixed by command-line option: using that to override \DDoptions %s" % (key, val, option)
                     else:
                         self.options[key] = val
                  # print "OPTIONS = ", self.options
