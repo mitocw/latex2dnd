@@ -211,13 +211,13 @@ class DNDspec2tex(object):
     CHECK_FORMULA_BOXES: <formula using [#], where [#] is the MATCH label number; needed if MATCH labels appear in more than one input box>
 
     """
-    def __init__(self, sfn, output_fp=None, input_tex=None, verbose=False):
+    def __init__(self, sfn, output_fp=None, input_tex=None, verbose=False, default_dpi="300"):
         '''
         sfn = dndpsec filename (should be *.dndspec)
         '''
         self.input_filename = sfn
         self.verbose = verbose
-        self.parse_file(sfn, input_tex=input_tex)
+        self.parse_file(sfn, input_tex=input_tex, default_dpi=default_dpi)
         self.assemble_labels()
         self.assemble_dnd_expression()
         self.assemble_dnd_formula()
@@ -236,7 +236,7 @@ class DNDspec2tex(object):
             print "Wrote dnd tex to %s" % ofn
         self.tex_filename = ofn
 
-    def parse_file(self, sfn, input_tex=None):
+    def parse_file(self, sfn, input_tex=None, default_dpi="300"):
         self.match_labels = None
         self.distractor_labels = []
         self.all_labels = []
@@ -248,6 +248,8 @@ class DNDspec2tex(object):
         self.label_delimeter = ","	# default is that MATCH_LABELS and ALL_LABELS are delimited by a comma
         self.comments = ""
         self.extra_header_tex = ""
+        self.resolution = default_dpi
+        self.dd_options = "HIDE_FORMULA_INPUT"
         self.formula_tests = []		# list of dicts specifying tests
         self.label_objects_by_box_index = {}	# key=index, val=DNDlabel object
         self.label_objects_by_draggable_id = {}	# key = draggable label, val=DNDlabel object
@@ -283,6 +285,8 @@ class DNDspec2tex(object):
                          'CHECK_FORMULA_BOXES': {'field': 'check_formula_boxes', 'func': space_pad},
                          'TEST_CORRECT': {'field': 'formula_tests', 'func': make_test_correct, 'append': True},
                          'TEST_INCORRECT': {'field': 'formula_tests', 'func': make_test_incorrect, 'append': True},
+                         'RESOLUTION': {'field': 'resolution', 'func': None},
+                         'OPTIONS': {'field': 'dd_options', 'func': None},
                          'NAME': {'field': 'dnd_name', 'func': None},
                          'TITLE': {'field': 'dnd_title', 'func': None},
         }
@@ -573,10 +577,15 @@ class DNDspec2tex(object):
                   'BOX_WIDTH': self.box_width,
                   'BOX_HEIGHT': self.box_height,
                   'EXTRA_HEADER_TEX': self.extra_header_tex,
+                  'RESOLUTION': self.resolution,
+                  'DD_OPTIONS': self.dd_options,
                   }
         for key, val in params.items():
-            template = template.replace('<' + key + '>', val)
-            
+            try:
+                template = template.replace('<' + key + '>', val)
+            except Exception as err:
+                raise Exception("[latex2dnd.dndspec] failed to substitute template key=%s, value=%s, err=%s" % (key, val, err))
+                
         self.dnd_tex = template
                                  
 #-----------------------------------------------------------------------------
