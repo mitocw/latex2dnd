@@ -290,7 +290,7 @@ class LatexToDragDrop(object):
         if compile:
             # set the TEXINPUTS path
             mydir = os.path.dirname(__file__)
-            oldti = os.environ['TEXINPUTS']
+            oldti = os.environ.get('TEXINPUTS', "")
             texpath = os.path.abspath(mydir + '/tex')
             newti = "::%s" % texpath
             if oldti:
