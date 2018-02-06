@@ -223,9 +223,11 @@ for futher customizations), together with all the usual output of latex2dnd.
 
 More formally:
 
+    DELIMETER: <character to use as a delimeter: defaults to ,>
     MATCH_LABELS: <comma separated list of labels appearing in EXPRESSION which should be made into boxes>
     DISTRACTOR_LABELS: <comma separated list of labels to be shown as draggables>
     ALL_LABELS: <comma separated list of MATCH and DISTRACTOR labels, in desired order, to be shown as draggables>
+    MATH_EXP: <label>, <math_exp_for_label>  (may be used multiple times; each use should be for a single label)
     BEGIN_EXPRESSION
           <latex expression containing MATCH labels, with spaces around every label>
     END_EXPRESSION
@@ -236,6 +238,7 @@ More formally:
     BOX_HEIGHT: draggable label box height to use
     BOX_WIDTH: draggable label box width to use
     EXTRA_HEADER_TEX: a line with extra latex commands to be inserted into the header (may be used multiple times)
+    OPTIONS: <dnd_options string>
 
 There should be no leading spaces / indentation on lines with keywords (like MATCH_LABELS).
 
