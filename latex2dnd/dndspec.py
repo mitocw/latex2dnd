@@ -204,6 +204,7 @@ class DNDspec2tex(object):
     MATCH_LABELS: <comma separated list of labels appearing in EXPRESSION which should be made into boxes>
     DISTRACTOR_LABELS: <comma separated list of labels to be shown as draggables>
     ALL_LABELS: <comma separated list of MATCH and DISTRACTOR labels, in desired order, to be shown as draggables>
+    MATH_EXP: <label>, <math_exp_for_label>
     BEGIN_EXPRESSION
           <latex expression containing MATCH labels>
     END_EXPRESSION
@@ -253,6 +254,7 @@ class DNDspec2tex(object):
         self.formula_tests = []		# list of dicts specifying tests
         self.label_objects_by_box_index = {}	# key=index, val=DNDlabel object
         self.label_objects_by_draggable_id = {}	# key = draggable label, val=DNDlabel object
+        self.label_math_exp = []	# list of (label, math_exp) as specified by user -- useful for giving numerical math_exp to text labels
         
         mode = None
         if not input_tex:
@@ -265,6 +267,14 @@ class DNDspec2tex(object):
             
         def space_pad(s):
             return ' ' + s + ' '
+
+        def make_label_math_exp(s):
+            label, math_exp = [x.strip() for x in s.split(',')]
+            if 0 and (not label in (self.match_labels + self.distractor_labels)):
+                msg = "[dndspec] cannot have MATH_EXP for unknown label %s" % label
+                print msg
+                raise Exception(msg)
+            return (label, math_exp)
 
         def make_test_correct(s):
             test_formula = ' ' + s + ' '            
@@ -289,6 +299,7 @@ class DNDspec2tex(object):
                          'OPTIONS': {'field': 'dd_options', 'func': None},
                          'NAME': {'field': 'dnd_name', 'func': None},
                          'TITLE': {'field': 'dnd_title', 'func': None},
+                         'MATH_EXP': {'field': 'label_math_exp', 'func': make_label_math_exp, 'append': True},
         }
 
         cnt = 0
@@ -349,12 +360,14 @@ class DNDspec2tex(object):
          # generate box index for labels ; distractor labels get dummy indices
         cnt = 0
         label_objs = OrderedDict()		# main dict of labels, with key=label tex, val=DNDlabel (with label_objs)
+        user_specified_math_exp = dict(self.label_math_exp)
 
         def make_label(label, cnt, ltype):
             return DNDlabel(label,
                             index_set=self.label_objects_by_box_index,
                             draggable_label_set=self.label_objects_by_draggable_id,
                             index=cnt,
+                            math_exp=user_specified_math_exp.get(label),
                             verbose=self.verbose,
                             ltype=ltype)
 
@@ -807,4 +820,28 @@ TEST_CORRECT: kappa^2 + frac1kappa^2 + 9 * ( -frac1kappa^3 )
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
     assert dst.varlist==['frac1kappa', 'kappa']
 
+def test_dndspec8():
+    # test math_exp
+    tex = r"""
+MATCH_LABELS: Gravity Constant, Mass One , R
+ALL_LABELS: Gravity Constant, Mass One , Mass Two , R
+MATH_EXP: Gravity Constant, G
+MATH_EXP: Mass One, m
+MATH_EXP: Mass Two, m
+BEGIN_EXPRESSION
+\bea
+	\frac{ Gravity Constant { Mass One } }{ R }
+\nonumber
+\eea
+END_EXPRESSION
+CHECK_FORMULA: G * m / R
+"""
+    from StringIO import StringIO
+    ofp = StringIO()
+    err = ''
+    dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
+    print dst.dnd_tex
+    assert dst.label_objs['Gravity Constant'].math_exp=="G"
+    assert dst.label_objs['Mass One'].math_exp=="m"
+    assert dst.label_objs['Mass Two'].math_exp=="m"
     
