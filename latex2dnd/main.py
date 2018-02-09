@@ -542,6 +542,12 @@ class LatexToDragDrop(object):
                 self.final_dpi = m.group(1)
                 self.dpi = "max"
             
+            m = re.match("max:([0-9]+)", self.dpi)		# if dpi=max:780 then let 780 be self.max_image_width, and autoscale to fit
+            if m:
+                self.dpi = "max"
+                self.max_image_width = int(m.group(1))
+                print "[latex2dnd] Using %d as maximum image width" % self.max_image_width
+
         if self.dpi=="max":
             # automatically set DPI by limiting image width to max_image_width
             self.dndpi = PageImage(self.pdffn, page=1, imfn=self.solimfn, dpi=self.final_dpi, verbose=self.imverbose)            

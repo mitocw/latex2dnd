@@ -238,7 +238,7 @@ class DNDspec2tex(object):
         self.tex_filename = ofn
 
     def parse_file(self, sfn, input_tex=None, default_dpi="300"):
-        self.match_labels = None
+        self.match_labels = []
         self.distractor_labels = []
         self.all_labels = []
         self.box_width = "8ex"
@@ -263,7 +263,10 @@ class DNDspec2tex(object):
             lines = input_tex.split('\n')
 
         def splitstr(s):
-            return [x.strip() for x in s.split(self.label_delimeter)]
+            strlist = [x.strip() for x in s.split(self.label_delimeter)]
+            if '' in strlist:
+                strlist.remove('')
+            return strlist
             
         def space_pad(s):
             return ' ' + s + ' '
@@ -287,8 +290,8 @@ class DNDspec2tex(object):
         keyword_table = {'BOX_WIDTH': {'field': 'box_width', 'func': None},
                          'BOX_HEIGHT': {'field': 'box_height', 'func': None},
                          'DELIMETER': {'field': 'label_delimeter', 'func': None},
-                         'EXTRA_HEADER_TEX': {'field': 'extra_header_tex', 'func': None},
-                         'MATCH_LABELS': {'field': 'match_labels', 'func': splitstr},
+                         'EXTRA_HEADER_TEX': {'field': 'extra_header_tex', 'func': None, 'add': True},
+                         'MATCH_LABELS': {'field': 'match_labels', 'func': splitstr, 'add': True},
                          'DISTRACTOR_LABELS': {'field': 'distractor_labels', 'func': splitstr, 'add': True},
                          'ALL_LABELS': {'field': 'all_labels', 'func': splitstr, 'add': True},
                          'CHECK_FORMULA': {'field': 'check_formula', 'func': space_pad},
@@ -402,6 +405,9 @@ class DNDspec2tex(object):
         expr = expr.replace('[', '\[').replace(']', '\]')
         expr = expr.replace('+', '\+')
         expr = expr.replace('|', '\|')
+        expr = expr.replace('*', '\*')
+        expr = expr.replace('}', '\}')
+        # expr = expr.replace('_', '\_')
         return expr
 
     def assemble_dnd_expression(self):
