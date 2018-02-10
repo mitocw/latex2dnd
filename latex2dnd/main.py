@@ -431,7 +431,7 @@ class LatexToDragDrop(object):
             if self.verbose:
                 print "    Using custom check function '%s' to evaluate DND output" % cfn
                 
-        elif self.dnd_formula:
+        elif self.dnd_formula and self.dnd_formula.get('formula'):
             
             # if self.dnd_formula is not {}, then use a formula for checking, 
             # with customresponse script code, instead of the default
@@ -459,13 +459,13 @@ class LatexToDragDrop(object):
             dndf = self.dnd_formula
 
             # do some error checking here - validate samples string
-            m = re.search('([^@]+)@([^:]+):([^\#]+)#(\d+)', repr(dndf['samples']))
-            if not m:
-                print "WARNING!!! Incorrect \DDforumla samples expression?  you have:"
-                print "  formula = %s" % dndf['formula']
-                print "  samples = %s" % dndf['samples']
-                print "  expect  = %s" % dndf['expect']
-
+            if dndf.get('formula'):
+                m = re.search('([^@]+)@([^:]+):([^\#]+)#(\d+)', repr(dndf['samples']))
+                if not m:
+                    print "WARNING!!! Incorrect \DDforumla samples expression?  you have:"
+                    print "  formula = %s" % dndf['formula']
+                    print "  samples = %s" % dndf['samples']
+                    print "  expect  = %s" % dndf['expect']
 
             info = {'CHECK_FUNCTION': cfn,
                     'CHECK_DMAP': repr(dmap),
@@ -515,6 +515,11 @@ class LatexToDragDrop(object):
                           "# use this for debugging\n"
                           "# messages = ['ans=%s' % submission[0]]\n")
     
+            errmsg = self.dnd_formula.get('err')
+            if errmsg:
+                cacode += ("if correct==['incorrect']:\n"
+                           "    messages = [%s]\n" % repr(errmsg))
+
             answer.text = '\ncaset = %s\n' % repr(anskey) + cacode
     
         sol = etree.SubElement(xml, 'solution')

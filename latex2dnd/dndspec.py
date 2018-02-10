@@ -255,6 +255,8 @@ class DNDspec2tex(object):
         self.label_objects_by_box_index = {}	# key=index, val=DNDlabel object
         self.label_objects_by_draggable_id = {}	# key = draggable label, val=DNDlabel object
         self.label_math_exp = []	# list of (label, math_exp) as specified by user -- useful for giving numerical math_exp to text labels
+        self.dnd_feedback = None
+        self.dnd_feedback_tex = ""
         
         mode = None
         if not input_tex:
@@ -303,6 +305,7 @@ class DNDspec2tex(object):
                          'NAME': {'field': 'dnd_name', 'func': None},
                          'TITLE': {'field': 'dnd_title', 'func': None},
                          'MATH_EXP': {'field': 'label_math_exp', 'func': make_label_math_exp, 'append': True},
+                         'FEEDBACK': {'field': 'dnd_feedback', 'func': None},
         }
 
         cnt = 0
@@ -586,6 +589,9 @@ class DNDspec2tex(object):
         texpath = os.path.abspath(mydir + '/tex')
         template = open(texpath + "/dndspec_template.tex").read()
 
+        if self.dnd_feedback is not None:
+            self.dnd_feedback_tex = "\\DDfeedback{%s}" % self.dnd_feedback
+
         params = {'FILENAME': self.input_filename,
                   'LABELS': self.label_tex,
                   'COMMENTED_EXPRESSION': self.commented_expression,
@@ -598,6 +604,7 @@ class DNDspec2tex(object):
                   'EXTRA_HEADER_TEX': self.extra_header_tex,
                   'RESOLUTION': self.resolution,
                   'DD_OPTIONS': self.dd_options,
+                  'DD_FEEDBACK': self.dnd_feedback_tex,
                   }
         for key, val in params.items():
             try:
