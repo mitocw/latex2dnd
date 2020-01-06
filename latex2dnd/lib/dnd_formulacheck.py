@@ -7,9 +7,8 @@ import json
 def is_formula_equal(expected, given, samples, cs=True, tolerance=0.01):
     try:
         variables = samples.split('@')[0].split(',')
-        sranges = zip(*map(lambda x: map(float, x.split(",")),
-                           samples.split('@')[1].split('#')[0].split(':')))
-        ranges = dict(zip(variables, sranges))
+        sranges = list(zip(*[list(map(float, x.split(","))) for x in samples.split('@')[1].split('#')[0].split(':')]))
+        ranges = dict(list(zip(variables, sranges)))
     except Exception as err:
         raise Exception("is_formula_eq: failed to evaluate samples expression '%s', err=%s" % (samples, str(err)))
     try:
@@ -54,7 +53,7 @@ def dnd_check_formula(expect, ans, draggable_map, target_formula, samples, optio
     target_syms = {}
     for dnddict in anslist:
         # each dnddict is {draggable_id : target_id}
-        (did, tid) = dnddict.items()[0]
+        (did, tid) = list(dnddict.items())[0]
         try:
             # turn target id's which are numbers into _number (so that format strings work)
             tidnum = int(tid)

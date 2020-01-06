@@ -9,7 +9,7 @@ except:
     from path import Path as path
 import latex2dnd as l2dndmod
 from latex2dnd.main import LatexToDragDrop
-from StringIO import StringIO
+from io import StringIO
 
 @contextlib.contextmanager
 def make_temp_directory():
@@ -22,8 +22,8 @@ class TestGravityWithOptions(unittest.TestCase):
     def test_gravity_with_options(self):
         testdir = path(l2dndmod.__file__).parent / 'testtex'  
         fn = testdir / 'gravity2.tex'
-        print "="*70
-        print "file %s" % fn
+        print("="*70)
+        print("file %s" % fn)
         with make_temp_directory() as tmdir:
             nfn = '%s/%s' % (tmdir, fn.basename())
             os.system('cp %s/* %s' % (testdir, tmdir))

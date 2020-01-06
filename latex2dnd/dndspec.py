@@ -45,7 +45,7 @@ class DNDlabel(object):
 
         self.make_math_variable()
         if self.ltype=="distractor":
-            all_known_mathvars = [x.math_variable for x in self.draggable_label_set.values()]
+            all_known_mathvars = [x.math_variable for x in list(self.draggable_label_set.values())]
             if self.math_variable is not None and (self.math_variable not in all_known_mathvars):
                 self.math_variable = distractor_variable
 
@@ -57,9 +57,9 @@ class DNDlabel(object):
         self.draggable_label_set[draggable_label] = self
 
         if self.verbose:
-            print "          [%s] Mapping label '%s' [%s] to variable '%s', math exp '%s' (%s)" % (index, tex, draggable_label,
+            print("          [%s] Mapping label '%s' [%s] to variable '%s', math exp '%s' (%s)" % (index, tex, draggable_label,
                                                                                                   self.math_variable, self.math_exp,
-                                                                                                  self.ltype)
+                                                                                                  self.ltype))
 
         self.ddlabel = "\\DDlabel[%s]{%s}{$%s$}" % (self.math_exp, self.draggable_label, self.tex)
         self.formula_box = [ ]
@@ -122,14 +122,14 @@ class DNDlabel(object):
         else:
             index = self.get_new_index()
             if self.verbose:
-                print "[dndspec] generating new box index %d for label %s" % (index, self.tex)
+                print("[dndspec] generating new box index %d for label %s" % (index, self.tex))
         ddbox = " \\DD%s{%d}{%s} " % (bwidth, index, self.draggable_label)
         self.ddboxes[index] = ddbox
         self.formula_box.append( " ([%s]) " % index  )	# boxed expression for formulas
         return ddbox
 
     def make_math_exp(self, tex):
-        if all([ x in string.letters or x in string.digits for x in tex]):
+        if all([ x in string.ascii_letters or x in string.digits for x in tex]):
             return tex
 
         m = re.match('\\\\frac\{([0-9]+)}\{([0-9])+}$', tex)	# numerical fractions, e.g. \frac{1}{2} -> 1/2
@@ -153,11 +153,11 @@ class DNDlabel(object):
         while idx < len(tex):
             has_more = (idx+1 < len(tex))
             c = tex[idx]
-            if c in string.letters or c in string.digits:
+            if c in string.ascii_letters or c in string.digits:
                 expr += c
             elif c=='^' and has_more and (tex[idx+1] in string.digits):
                 expr += c
-            elif c=='-' and has_more and (tex[idx+1] in (string.digits + string.letters + '\\')):
+            elif c=='-' and has_more and (tex[idx+1] in (string.digits + string.ascii_letters + '\\')):
                 expr += c
             elif c in replp:
                 expr += replp[c]
@@ -171,7 +171,7 @@ class DNDlabel(object):
         return expr
 
     def make_draggable_label(self, tex):
-        if all([ x in string.letters for x in tex]):
+        if all([ x in string.ascii_letters for x in tex]):
             return tex
         expr = ""
         digit_names = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
@@ -179,7 +179,7 @@ class DNDlabel(object):
                  '-': 'minus',
                  }
         for c in tex:
-            if c in string.letters:
+            if c in string.ascii_letters:
                 expr += c
             elif c in string.digits:
                 expr += digit_names[int(c)]
@@ -234,7 +234,7 @@ class DNDspec2tex(object):
         output_fp.write(self.dnd_tex)
 
         if self.verbose:
-            print "Wrote dnd tex to %s" % ofn
+            print("Wrote dnd tex to %s" % ofn)
         self.tex_filename = ofn
 
     def parse_file(self, sfn, input_tex=None, default_dpi="300"):
@@ -277,7 +277,7 @@ class DNDspec2tex(object):
             label, math_exp = [x.strip() for x in s.split(',')]
             if 0 and (not label in (self.match_labels + self.distractor_labels)):
                 msg = "[dndspec] cannot have MATH_EXP for unknown label %s" % label
-                print msg
+                print(msg)
                 raise Exception(msg)
             return (label, math_exp)
 
@@ -327,7 +327,7 @@ class DNDspec2tex(object):
                 continue
 
             kwfound = False
-            for kw, kwinfo in keyword_table.items():
+            for kw, kwinfo in list(keyword_table.items()):
                 m = re.match('^%s:(.*)' % kw, k)
                 if m:
                     val = m.group(1).strip()
@@ -343,15 +343,15 @@ class DNDspec2tex(object):
 
             if not kwfound:
                 msg = "[dndspec]: Cannot interpret line %d: %s" % (cnt, k)
-                print msg
+                print(msg)
                 raise Exception(msg)
 
         if self.verbose:
-            print "[dndspec] from file %s read %d match labels, %d labels alltogether, and %d tests" % (sfn,
+            print("[dndspec] from file %s read %d match labels, %d labels alltogether, and %d tests" % (sfn,
                                                                                                         len(self.match_labels),
                                                                                                         len(self.all_labels),
                                                                                                         len(self.formula_tests),
-                                                                                                        )
+                                                                                                        ))
             
     def assemble_labels(self):
         '''
@@ -426,17 +426,17 @@ class DNDspec2tex(object):
             try:
                 matches = re.findall(labre, dnd_expression, flags=re.M)
             except Exception as err:
-                print "Error in dndspec - failed to assemble DND expression, labre=%s, dnd_expression=%s" % (labre, dnd_expression)
+                print("Error in dndspec - failed to assemble DND expression, labre=%s, dnd_expression=%s" % (labre, dnd_expression))
                 raise
             if not matches:
                 msg = "--> [dndspec] WARNING: no matching label '%s' found in expression!" % label
-                print msg
-                print "expression = %s" % dnd_expression
-                print "label regular expression = %s" % labre
-                print "search: %s" % (re.search(labre, dnd_expression, flags=re.M))
+                print(msg)
+                print("expression = %s" % dnd_expression)
+                print("label regular expression = %s" % labre)
+                print("search: %s" % (re.search(labre, dnd_expression, flags=re.M)))
                 raise Exception(msg)
             if self.verbose:
-                print "[dndspec] found %d matches for label '%s' in expression" % (len(matches), label)
+                print("[dndspec] found %d matches for label '%s' in expression" % (len(matches), label))
             for match in matches:
                 # if a label appears multiple times in the expression, then
                 # the the box numbers must change, to ensure all DDB box numbers
@@ -446,7 +446,7 @@ class DNDspec2tex(object):
                 dnd_expression = re.sub(labre, make_ddbox, dnd_expression, count=1, flags=re.M)
         self.dnd_expression = dnd_expression
         if self.verbose:
-            print "[dndspec] dnd_expression=%s" % self.dnd_expression
+            print("[dndspec] dnd_expression=%s" % self.dnd_expression)
 
     def formula_to_boxed(self, formula, labelset=None, exit_on_failure=True, missing_ok=False):
         '''
@@ -467,17 +467,17 @@ class DNDspec2tex(object):
                     box = lobj.formula_box[index]
                 else:
                     msg = "--> [dndspec] Error! %d matches already found for %s in formula %s, but just found another?" % (n_matches, label, formula)
-                    print "    label math expression = %s" % labre
-                    print msg
+                    print("    label math expression = %s" % labre)
+                    print(msg)
                     raise Exception(msg)
                 (formula, nmatch) = re.subn(labre, box, formula, count=1)
                 n_matches += nmatch
                 index += 1
             if not n_matches and (not missing_ok):
                 msg = "--> [dndspec] WARNING: no matching math expression found for '%s' (%s) in formula" % (label, lobj.math_exp)
-                print msg
-                print "    formula = %s" % formula
-                print "    label math expression = %s" % labre
+                print(msg)
+                print("    formula = %s" % formula)
+                print("    label math expression = %s" % labre)
                 if exit_on_failure:
                     sys.exit(0)
                 else:
@@ -503,7 +503,7 @@ class DNDspec2tex(object):
                 msg = "[dndspec] Failed to make instructor formula expression, label=%s, math_exp=%s, formula=%s" % (labre,
                                                                                                                      lobj.math_exp,
                                                                                                                      self.math_check_formula)
-                print msg
+                print(msg)
                 raise Exception(msg)
 
         # make check formula boxes if one not provided
@@ -519,9 +519,9 @@ class DNDspec2tex(object):
         self.formula_sample_ranges = ','.join('1'*nvar) + ":" + ','.join(['20']*nvar) 
         self.formula_samples = "%s@%s\\#%d" % (self.formula_variables, self.formula_sample_ranges, self.formula_nsamples)
         if self.verbose:
-            print "[dndspec] Generated check_formula_boxes '%s'" % self.check_formula_boxes
-            print "          Using %d variables: %s" % (nvar, self.formula_variables)
-            print "          And taking %d samples" % (self.formula_nsamples)
+            print("[dndspec] Generated check_formula_boxes '%s'" % self.check_formula_boxes)
+            print("          Using %d variables: %s" % (nvar, self.formula_variables))
+            print("          And taking %d samples" % (self.formula_nsamples))
 
         self.varlist = varlist
         self.dd_formula = "\\DDformula{ %s }{ %s }{ %s }{}" % (self.check_formula_boxes,
@@ -554,7 +554,7 @@ class DNDspec2tex(object):
                                                            labelset=self.all_labels,
                                                            exit_on_failure=False, missing_ok=True)
             except Exception as err:
-                print "[dndspec] Failed to construct test for test_formula='%s'" % (test['formula'])
+                print("[dndspec] Failed to construct test for test_formula='%s'" % (test['formula']))
                 raise
 
             # compare boxed_test_formula to check_formula_boxes to see which boxes the input is going into
@@ -563,23 +563,23 @@ class DNDspec2tex(object):
             # translate test formula box id's into draggable label id's
             label_ids = [ self.label_objects_by_box_index[x].draggable_label for x in test_formula_box_id_list ]
             target_ids = check_formula_box_id_list
-            test['target_ids'] = map(str, target_ids)
+            test['target_ids'] = list(map(str, target_ids))
             test['draggable_ids'] = label_ids
             if not len(label_ids)==len(target_ids):
                 msg = "[dndspec] Error generating test from formula '%s'" % test['formula']
-                print msg
-                print "          Found %d target ID's but %d draggable label ID's" % (len(target_ids), len(label_ids))
-                print "          Boxed test formula = %s" % boxed_test_formula
-                print "          Taget ID's: %s" % str(target_ids)
-                print "          Draggable label ID's: %s" % str(label_ids)
+                print(msg)
+                print("          Found %d target ID's but %d draggable label ID's" % (len(target_ids), len(label_ids)))
+                print("          Boxed test formula = %s" % boxed_test_formula)
+                print("          Taget ID's: %s" % str(target_ids))
+                print("          Draggable label ID's: %s" % str(label_ids))
                 raise Exception(msg)
             test_tex.append('\\DDtest{%s}{%s}{%s}' % (test['etype'], ','.join(test['target_ids']), ','.join(test['draggable_ids'])))
 
         self.formula_test_tex = '\n'.join(test_tex)
         if self.verbose:
-            print "[dndspec] Generated %d tests:" % len(test_tex)
+            print("[dndspec] Generated %d tests:" % len(test_tex))
             for test in test_tex:
-                print "          %s" % test
+                print("          %s" % test)
 
     def generate_tex(self):
         '''
@@ -606,7 +606,7 @@ class DNDspec2tex(object):
                   'DD_OPTIONS': self.dd_options,
                   'DD_FEEDBACK': self.dnd_feedback_tex,
                   }
-        for key, val in params.items():
+        for key, val in list(params.items()):
             try:
                 template = template.replace('<' + key + '>', val)
             except Exception as err:
@@ -645,21 +645,21 @@ def test_dndlabel5():
                                  
 def test_dndlabel6():
     ddl = DNDlabel("m_1", index_set={}, draggable_label_set={}, ltype="match")
-    print "math_exp for m_1 = %s" % ddl.math_exp
+    print("math_exp for m_1 = %s" % ddl.math_exp)
     assert ddl.math_exp=="m_1"
     assert ddl.math_variable=="m_1"
     assert ddl.draggable_label == "mone"
                                  
 def test_dndlabel6():
     ddl = DNDlabel("E_0^2", index_set={}, draggable_label_set={}, ltype="match")
-    print "math_exp for E_0^2 = %s" % ddl.math_exp
+    print("math_exp for E_0^2 = %s" % ddl.math_exp)
     assert ddl.math_exp=="E_0^2"
     assert ddl.math_variable=="E_0"
     assert ddl.draggable_label == "Ezerotwo"
                                  
 def test_dndlabel7():
     ddl = DNDlabel("\mu_0", index_set={}, draggable_label_set={}, ltype="match")
-    print "math_exp for \mu_0 = %s" % ddl.math_exp
+    print("math_exp for \mu_0 = %s" % ddl.math_exp)
     assert ddl.math_exp=="mu0"
     assert ddl.math_variable=="mu0"
     assert ddl.draggable_label == "muzero"
@@ -676,11 +676,11 @@ END_EXPRESSION
 CHECK_FORMULA: -pi * ( Bprime * d^2 ) / ( v )
 TEST_CORRECT: -pi * ( d^2 * Bprime ) / ( v )
     """
-    from StringIO import StringIO
+    from io import StringIO
     ofp = StringIO()
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
     contents = str(ofp.getvalue())
-    print contents
+    print(contents)
     assert( r'\DDtest{correct}{1,2,3,4}{minuspi,dtwo,Bprime,v}' in contents)
     assert( r'\DDformula{  ([1]) * ( ([2]) * ([3]) ) / ( ([4]) )  }{ pi,v,d,Bprime@1,1,1,1:20,20,20,20\#20 }{  -pi * ( Bprime * d^2 ) / ( v )  }{}' in contents)    
     assert( r'P =\exp\left( \DDB{1}{minuspi} \mu \frac{ \DDB{2}{Bprime} \DDB{3}{dtwo} }{ \DDB{4}{v} \hbar } \right)' in contents)
@@ -699,14 +699,14 @@ BEGIN_EXPRESSION
 END_EXPRESSION
 CHECK_FORMULA: 2 * v / ( mu * Bprime )
 """
-    from StringIO import StringIO
+    from io import StringIO
     ofp = StringIO()
     err = ''
     try:
         dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
     except Exception as err:
         pass
-    print str(err)
+    print(str(err))
     assert "WARNING: no matching label 'mu' found" in str(err)
 
 def test_dndspec3():
@@ -721,7 +721,7 @@ BEGIN_EXPRESSION
 END_EXPRESSION
 CHECK_FORMULA: G * m_1 * m_2 / R
 """
-    from StringIO import StringIO
+    from io import StringIO
     ofp = StringIO()
     err = ''
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
@@ -740,7 +740,7 @@ BEGIN_EXPRESSION
 END_EXPRESSION
 CHECK_FORMULA: G * m_1 * m_2 / R
 """
-    from StringIO import StringIO
+    from io import StringIO
     ofp = StringIO()
     err = ''
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
@@ -760,7 +760,7 @@ BEGIN_EXPRESSION
 END_EXPRESSION
 CHECK_FORMULA: G * m12 * m_2 / R
 """
-    from StringIO import StringIO
+    from io import StringIO
     ofp = StringIO()
     err = ''
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
@@ -780,7 +780,7 @@ BEGIN_EXPRESSION
 END_EXPRESSION
 CHECK_FORMULA: frac1lambdaj * omegaj20 + omegaj2t * lambdaj
 """
-    from StringIO import StringIO
+    from io import StringIO
     ofp = StringIO()
     err = ''
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
@@ -797,7 +797,7 @@ BEGIN_EXPRESSION
 \eea
 END_EXPRESSION
 """
-    from StringIO import StringIO
+    from io import StringIO
     ofp = StringIO()
     err = ''
     the_err = ""
@@ -826,7 +826,7 @@ END_EXPRESSION
 CHECK_FORMULA: frac1kappa^2 + kappa^2 + 9 * ( -frac1kappa^3 )
 TEST_CORRECT: kappa^2 + frac1kappa^2 + 9 * ( -frac1kappa^3 )
 """
-    from StringIO import StringIO
+    from io import StringIO
     ofp = StringIO()
     err = ''
     the_err = ""
@@ -849,11 +849,11 @@ BEGIN_EXPRESSION
 END_EXPRESSION
 CHECK_FORMULA: G * m / R
 """
-    from StringIO import StringIO
+    from io import StringIO
     ofp = StringIO()
     err = ''
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
-    print dst.dnd_tex
+    print(dst.dnd_tex)
     assert dst.label_objs['Gravity Constant'].math_exp=="G"
     assert dst.label_objs['Mass One'].math_exp=="m"
     assert dst.label_objs['Mass Two'].math_exp=="m"

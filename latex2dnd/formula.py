@@ -42,21 +42,21 @@ class FormulaTester(object):
         self.unit_tests += unit_tests
 
     def make_expected_ans(self, target_assignments):
-        return [ {draggable_id: target_id} for target_id, draggable_id in target_assignments.items() ]
+        return [ {draggable_id: target_id} for target_id, draggable_id in list(target_assignments.items()) ]
 
     def run_tests(self):
         cnt = 0
-        print "---------- Running %d DD formula unit tests ----------" % len(self.unit_tests)
+        print("---------- Running %d DD formula unit tests ----------" % len(self.unit_tests))
         self.test_results = []
         for ut in self.unit_tests:
             cnt += 1
             ret = self.test_answer(ut['etype'], ut['expected_ans'])
             self.test_results.append(ret)
             if ret['test_ok']:
-                print "DDformula test [%d] OK" % cnt
+                print("DDformula test [%d] OK" % cnt)
             else:
                 msg = "DDformula test [%d] ERROR! FAILURE on %s" % (cnt, ut)
-                print msg
+                print(msg)
                 raise Exception(msg)
         return self.test_results
 
@@ -70,9 +70,9 @@ class FormulaTester(object):
         try:
             ret = self.mod.dnd_check_function(None, json.dumps(expected_ans))
         except Exception as err:
-            print "ERROR in testing dnd check function: %s" % str(err)
-            print "etype=%s" % etype
-            print "expected_ans=%s" % expected_ans
+            print("ERROR in testing dnd check function: %s" % str(err))
+            print("etype=%s" % etype)
+            print("expected_ans=%s" % expected_ans)
             raise Exception("DDformula failure on %s" % json.dumps(expected_ans))
         ret['test_etype'] = etype
         ret['test_expected_ans'] = expected_ans
