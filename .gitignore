@@ -30,3 +30,5 @@ pip-log.txt
 #OSX files
 .DS_Store
 .paux
+
+latex2dnd2

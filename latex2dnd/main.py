@@ -34,8 +34,8 @@ except:
     from path import Path as path
 from lxml import etree
 from collections import OrderedDict
-from formula import FormulaTester
-from dndspec import DNDspec2tex
+from .formula import FormulaTester
+from .dndspec import DNDspec2tex
 
 class PageImage(object):
     '''
@@ -58,7 +58,7 @@ class PageImage(object):
         # get page from PDF
         cmd = "pdfseparate -l %s -f %s %s tmp.pdf" % (page, page, fn)
         if verbose:
-            print cmd
+            print(cmd)
         os.system(cmd)
         if not os.path.exists("tmp.pdf"):
             raise Exception("===> [latex2dnd] error running pdfseparate, command: %s" % cmd)
@@ -66,29 +66,29 @@ class PageImage(object):
         # crop the file, verbosely, to get the bounding box
         cmd = 'pdfcrop --verbose tmp.pdf %s' % (pdfimfn)
         if verbose:
-            print cmd
+            print(cmd)
         try:
             bbstr = os.popen(cmd).read()
         except Exception as err:
-            print "===> [latex2dnd] error running pdfcrop, command: %s" % cmd
-            print "Error: ", err
+            print("===> [latex2dnd] error running pdfcrop, command: %s" % cmd)
+            print("Error: ", err)
             raise
 
         try:
             hrbb_str = re.findall('HiResBoundingBox:([^\n]+)', bbstr)[0].split()
         except Exception as err:
-            print "===> [latex2dnd] error finding high resolution bounding boxes in output from command: %s" % cmd
-            print "Error: ", err
+            print("===> [latex2dnd] error finding high resolution bounding boxes in output from command: %s" % cmd)
+            print("Error: ", err)
             raise
 
 	# turn bounding box into units of inches
         def pt2in(x):
             return float(x) * 1.0/72
 
-        hrbb = map(pt2in, hrbb_str)
+        hrbb = list(map(pt2in, hrbb_str))
 
         if verbose:
-            print "BoundingBox (inches): %s" % hrbb
+            print("BoundingBox (inches): %s" % hrbb)
 
         self.fn = fn
         self.pdfimfn = pdfimfn
@@ -98,7 +98,7 @@ class PageImage(object):
         # generate PNG from cropped PDF
         cmd = "pdftoppm -r %s -png %s > %s" % (dpi, pdfimfn, imfn)
         if verbose:
-            print cmd
+            print(cmd)
         os.system(cmd)
         
         # get png image size
@@ -107,7 +107,7 @@ class PageImage(object):
 
         imdat = os.popen('file %s' % imfn).read().split()[4:7]
         if verbose:
-            print imdat
+            print(imdat)
         imx = int(imdat[0])
         imy = int(imdat[2][:-1])
 
@@ -129,7 +129,7 @@ class PageImage(object):
                                                                      geom=geom,
                                                                      outfn=outfn)
         if self.verbose:
-            print cmd
+            print(cmd)
         os.system(cmd)
         if not os.path.exists(outfn):
             raise Exception("===> [latex2dnd] error running convert, command: %s" % cmd)
@@ -157,7 +157,7 @@ class PageImage(object):
                                                         regions=' '.join(regions),
                                                         outfn=outfn)
         if self.verbose:
-            print cmd
+            print(cmd)
         os.system(cmd)
         if not os.path.exists(outfn):
             raise Exception("===> [latex2dnd] error running convert, command: %s" % cmd)
@@ -177,7 +177,7 @@ class PageImage(object):
                                                            geom=geom,
                                                            outfn=outfn)
         if self.verbose:
-            print cmd
+            print(cmd)
         os.system(cmd)
         if not os.path.exists(outfn):
             raise Exception("===> [latex2dnd] error running convert, command: %s" % cmd)
@@ -206,16 +206,16 @@ class Box(object):
             return float(x) * (1.0/72.27)/65536
 
         # llx, lly, urx, ury = map(toinches, numbers.split(', '))
-        self.pos = map(toinches, self.numbers.split(', '))
+        self.pos = list(map(toinches, self.numbers.split(', ')))
 
         # save highres bounding box (units: inches)
         self.hrbb = hrbb
 
         if self.verbose:
-            print str(self)
+            print(str(self))
         self.offset(hrbb[0], hrbb[1])
         if self.verbose:
-            print "  --> offset %s" % str(self)
+            print("  --> offset %s" % str(self))
 
     def __str__(self):
         return "Box %s: %s" % (self.label, self.pos)
@@ -243,7 +243,7 @@ class Box(object):
 
         def in_to_px(x):
             return int(cf * x)
-        return map(in_to_px, [self.pos[0], ysize-self.pos[1], self.pos[2], ysize-self.pos[3]])
+        return list(map(in_to_px, [self.pos[0], ysize-self.pos[1], self.pos[2], ysize-self.pos[3]]))
 
 
     def png_geom(self, imx, imy, delta=0):
@@ -298,9 +298,9 @@ class LatexToDragDrop(object):
             os.environ['TEXINPUTS'] = newti
                 
             if verbose:
-                print "Setting TEXINPUTS=%s" % os.environ['TEXINPUTS']
-                print "Running latex twice"
-                print "-"*77
+                print("Setting TEXINPUTS=%s" % os.environ['TEXINPUTS'])
+                print("Running latex twice")
+                print("-"*77)
             imstr = ""
             if interactionmode:
                 imstr = "-interaction=%s" % interactionmode
@@ -308,14 +308,14 @@ class LatexToDragDrop(object):
             for k in range(2):
                 os.system('pdflatex %s %s' % (imstr, texfn))
             if verbose:
-                print "="*77
+                print("="*77)
 
         outdir = path(outdir)
 
         if not os.path.exists(outdir):
             os.mkdir(outdir)
         if not os.path.isdir(outdir):
-            print "Error: output directory '%s' is not a directory" % outdir
+            print("Error: output directory '%s' is not a directory" % outdir)
             return
 
         self.outdir = outdir
@@ -352,35 +352,35 @@ class LatexToDragDrop(object):
         if do_cleanup and os.path.exists("tmp.pdf"):
             os.unlink("tmp.pdf")
             if verbose:
-                print "    Removed tmp.pdf"
+                print("    Removed tmp.pdf")
 
         if verbose:
-            print "="*70
-            print "Done.  Generated:"
-            print "    %s -- edX drag-and-drop question XML" % self.xmlfn
-            print "    %s -- dnd problem image" % self.dndimfn
-            print "    %s -- dnd problem solution image" % self.solimfn
-            print "    %d dnd draggable image labels:" % len(self.labels)
-            for label, lfn in self.labels.items():
-                print "        %s -- label '%s'" % (lfn, label)
-            print 
-            print "The DND image has size %s x %s (used DPI=%s)" % (self.dndpi.sizex, self.dndpi.sizey, self.final_dpi)
-            print "The XML expects images to be in %s" % self.imdir
-            print "="*70
+            print("="*70)
+            print("Done.  Generated:")
+            print("    %s -- edX drag-and-drop question XML" % self.xmlfn)
+            print("    %s -- dnd problem image" % self.dndimfn)
+            print("    %s -- dnd problem solution image" % self.solimfn)
+            print("    %d dnd draggable image labels:" % len(self.labels))
+            for label, lfn in list(self.labels.items()):
+                print("        %s -- label '%s'" % (lfn, label))
+            print() 
+            print("The DND image has size %s x %s (used DPI=%s)" % (self.dndpi.sizex, self.dndpi.sizey, self.final_dpi))
+            print("The XML expects images to be in %s" % self.imdir)
+            print("="*70)
 
     def cleanup_old_solution_image_files(self):
         '''
         Delete old solution image files, if present
         '''
         old_solimfn_pat = path(self.outdir) / (self.fnpre + '_dnd_sol_??????.png')
-        print "pat=%s" % old_solimfn_pat
+        print("pat=%s" % old_solimfn_pat)
         old_sol_image_files = list(glob.glob(old_solimfn_pat))
         if old_sol_image_files:
             if self.verbose:
-                print "[latex2dnd] Cleaning up by removing %d old files:" % (len(old_sol_image_files))
+                print("[latex2dnd] Cleaning up by removing %d old files:" % (len(old_sol_image_files)))
             for fn in old_sol_image_files:
                 os.unlink(fn)
-                print "            Removed %s" % fn
+                print("            Removed %s" % fn)
 
     def generate_dnd_xml(self):
         xmlfn = self.fnpre + '_dnd.xml'
@@ -395,7 +395,7 @@ class LatexToDragDrop(object):
         dnd.set('no_labels', 'true')
         dnd.set('label_bg_color', "rgb(222, 139, 238)")
 
-        for label, labnum in self.dnd_labels.items():
+        for label, labnum in list(self.dnd_labels.items()):
             draggable = etree.SubElement(dnd, 'draggable')
             draggable.set('id', label)
             draggable.set('icon', self.imdir + self.labels[labnum].basename())
@@ -403,7 +403,7 @@ class LatexToDragDrop(object):
                 draggable.set('can_reuse', 'true')
         
         anskey = []
-        for tname, aname in self.box_answers.items():
+        for tname, aname in list(self.box_answers.items()):
             target = etree.SubElement(dnd, 'target')
             target.set('id', tname)
             box = self.BoxSet['box' + tname]
@@ -415,7 +415,7 @@ class LatexToDragDrop(object):
             target.set('w', str(pos[2]-pos[0]))
             target.set('h', str(pos[1]-pos[3]))
             if self.verbose and False:
-                print "    %s" % etree.tostring(target)
+                print("    %s" % etree.tostring(target))
             dnd.append(etree.Comment(' answer=%s ' % aname))
             # anskey is a list of {draggable_id : target_id}
             anskey.append({aname: tname})
@@ -429,7 +429,7 @@ class LatexToDragDrop(object):
             cfn = self.options['custom_cfn']
             cr.set('cfn', cfn)
             if self.verbose:
-                print "    Using custom check function '%s' to evaluate DND output" % cfn
+                print("    Using custom check function '%s' to evaluate DND output" % cfn)
                 
         elif self.dnd_formula and self.dnd_formula.get('formula'):
             
@@ -450,7 +450,7 @@ class LatexToDragDrop(object):
 
             # map from draggable labels to label formula contents
             dmap = {}
-            for lname, lsym in self.dnd_label_contents.items():
+            for lname, lsym in list(self.dnd_label_contents.items()):
                 lsym = lsym.strip()
                 if lsym.startswith('$') and lsym.endswith('$'):
                     lsym = lsym[1:-1]
@@ -462,10 +462,10 @@ class LatexToDragDrop(object):
             if dndf.get('formula'):
                 m = re.search('([^@]+)@([^:]+):([^\#]+)#(\d+)', repr(dndf['samples']))
                 if not m:
-                    print "WARNING!!! Incorrect \DDforumla samples expression?  you have:"
-                    print "  formula = %s" % dndf['formula']
-                    print "  samples = %s" % dndf['samples']
-                    print "  expect  = %s" % dndf['expect']
+                    print("WARNING!!! Incorrect \DDforumla samples expression?  you have:")
+                    print("  formula = %s" % dndf['formula'])
+                    print("  samples = %s" % dndf['samples'])
+                    print("  expect  = %s" % dndf['expect'])
 
             info = {'CHECK_FUNCTION': cfn,
                     'CHECK_DMAP': repr(dmap),
@@ -477,11 +477,11 @@ class LatexToDragDrop(object):
                     'OPTION_HIDE_FORMULA_INPUT': repr(self.options.get('hide_formula_input', False))
                     }
 
-            for key, val in info.items():
+            for key, val in list(info.items()):
                 check_code = check_code.replace(key, val)
             script.text = '\n' + check_code
             if self.verbose:
-                print script.text
+                print(script.text)
 
             fut = FormulaTester(check_code, self.box_answers, self.unit_tests)
             self.test_results = fut.run_tests()
@@ -489,7 +489,7 @@ class LatexToDragDrop(object):
             with open(tfn,'w') as fp:
                 fp.write(json.dumps(self.test_results, indent=4))
             if self.verbose:
-                print "Wrote unit test results to %s" % tfn
+                print("Wrote unit test results to %s" % tfn)
 
         else:
 
@@ -527,7 +527,7 @@ class LatexToDragDrop(object):
         img.set('src', self.imdir + self.solimfn.basename())
 
         with open(xmlfn,'w') as fp:
-            fp.write(etree.tostring(xml, pretty_print=True))
+            fp.write(etree.tostring(xml, pretty_print=True).decode())
 
         self.xmlfn = xmlfn
 
@@ -536,12 +536,12 @@ class LatexToDragDrop(object):
         The image from latex has solutions in it.  We white-out the
         boxes to make the dnd image.
         '''
-        if type(self.dpi) in [str, unicode] and ('max' in self.dpi):
+        if type(self.dpi) in [str, str] and ('max' in self.dpi):
             self.final_dpi = 300
         else:
             self.final_dpi = self.dpi
         
-        if type(self.dpi) in [str, unicode]:
+        if type(self.dpi) in [str, str]:
             m = re.match("max([0-9]+)", self.dpi)	# if dpi=max200 then let 200 be the starting dpi value, but autoscale smaller to fit
             if m:
                 self.final_dpi = m.group(1)
@@ -551,19 +551,19 @@ class LatexToDragDrop(object):
             if m:
                 self.dpi = "max"
                 self.max_image_width = int(m.group(1))
-                print "[latex2dnd] Using %d as maximum image width" % self.max_image_width
+                print("[latex2dnd] Using %d as maximum image width" % self.max_image_width)
 
         if self.dpi=="max":
             # automatically set DPI by limiting image width to max_image_width
             self.dndpi = PageImage(self.pdffn, page=1, imfn=self.solimfn, dpi=self.final_dpi, verbose=self.imverbose)            
             if self.dndpi.sizex > self.max_image_width:
-                print "[latex2dnd] Page width %d exceeds max=%s at dpi=%s" % (self.dndpi.sizex, self.max_image_width, self.final_dpi)
+                print("[latex2dnd] Page width %d exceeds max=%s at dpi=%s" % (self.dndpi.sizex, self.max_image_width, self.final_dpi))
                 newdpi = int(self.final_dpi * 1.0 * self.max_image_width / self.dndpi.sizex * 0.95)
-                print "            Reducing dpi to %s" % newdpi
+                print("            Reducing dpi to %s" % newdpi)
                 self.final_dpi = newdpi
                 self.dndpi = PageImage(self.pdffn, page=1, imfn=self.solimfn, dpi=self.final_dpi, verbose=self.imverbose)            
                 if self.dndpi.sizex > self.max_image_width:
-                    print "[latex2dnd] Page width %d STILL exceeds max=%s at dpi=%s" % (self.dndpi.sizex, self.max_image_width, self.final_dpi)
+                    print("[latex2dnd] Page width %d STILL exceeds max=%s at dpi=%s" % (self.dndpi.sizex, self.max_image_width, self.final_dpi))
             
         self.dndpi = PageImage(self.pdffn, page=1, imfn=self.solimfn, dpi=self.final_dpi, verbose=self.imverbose)
         # old test
@@ -580,7 +580,7 @@ class LatexToDragDrop(object):
         
         # extract each label box
         # by convention, the label boxes are named boxLABEL###
-        for label, box in self.BoxSet.iteritems():
+        for label, box in self.BoxSet.items():
             if not label.startswith('boxLABEL'):
                 continue
             m = re.search('boxLABEL([0-9]+)', label)
@@ -589,7 +589,7 @@ class LatexToDragDrop(object):
             labelpi.ExtractBox(box, outfn)
             self.labels[label[8:]] = outfn
         if self.verbose:
-            print "  %s labels" % len(self.labels)
+            print("  %s labels" % len(self.labels))
             # print json.dumps(self.labels, indent=4)
 
     def load_dnd(self):
@@ -611,7 +611,7 @@ class LatexToDragDrop(object):
         dndfn = self.fnpre + '.dnd'
 
         if not os.path.exists(dndfn):
-            print "Error: %s does not exist; did the latex compilation fail?" % dndfn
+            print("Error: %s does not exist; did the latex compilation fail?" % dndfn)
             raise "latex2dnd_error"
 
         for k in open(dndfn):
@@ -637,12 +637,12 @@ class LatexToDragDrop(object):
                 target_ids = m.group(2).strip().split(',')
                 draggable_ids = m.group(3).strip().split(',')
                 if not len(target_ids)==len(draggable_ids):
-                    print "--> Error in DDtest: mismatch in length of target IDs and draggable IDs in '%s'" % k
+                    print("--> Error in DDtest: mismatch in length of target IDs and draggable IDs in '%s'" % k)
                     sys.exit(0)
-                target_assignments = dict(zip(target_ids, draggable_ids))
+                target_assignments = dict(list(zip(target_ids, draggable_ids)))
                 self.unit_tests.append({'etype': etype, 'target_assignments': target_assignments})
                 if self.verbose:
-                    print "Added unit test [%s] = %s" % (len(self.unit_tests), self.unit_tests[-1])
+                    print("Added unit test [%s] = %s" % (len(self.unit_tests), self.unit_tests[-1]))
 
             m = re.search('FORMULA: (.*)', k)
             if m:
@@ -674,13 +674,13 @@ class LatexToDragDrop(object):
                         key = option.lower().strip()
                         val = True
                     if self.options.get(key, None) is not None and self.command_line_options_override:
-                        print "  %s=%s already fixed by command-line option: using that to override \DDoptions %s" % (key, val, option)
+                        print("  %s=%s already fixed by command-line option: using that to override \DDoptions %s" % (key, val, option))
                     else:
                         self.options[key] = val
                  # print "OPTIONS = ", self.options
 
         if self.verbose:
-            print "  %s target boxes" % len(self.box_answers)
+            print("  %s target boxes" % len(self.box_answers))
 
     def load_boxes(self):
         '''
@@ -801,7 +801,7 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
         try:
             s2t = DNDspec2tex(fn, verbose=opts.verbose)
         except Exception as err:
-            print "[latex2dnd] Failed to run dndspec2tex on input file %s, err=%s" % (fn, err)
+            print("[latex2dnd] Failed to run dndspec2tex on input file %s, err=%s" % (fn, err))
             raise
         if opts.output_tex:
             sys.exit(0)
