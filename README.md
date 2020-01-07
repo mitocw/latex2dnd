@@ -15,6 +15,10 @@ Note that pdftoppm is needed.  With osX and macbrew:
 
     brew install netpbm poppler
 
+Also imagemagick is required
+
+    brew install imagemagick
+
 A working latex installation is also required.
 
 Usage
