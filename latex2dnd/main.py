@@ -68,7 +68,8 @@ class PageImage(object):
         if verbose:
             print(cmd)
         try:
-            bbstr = os.popen(cmd).read()
+            with os.popen(cmd) as cfp:
+                bbstr = cfp.read()
         except Exception as err:
             print("===> [latex2dnd] error running pdfcrop, command: %s" % cmd)
             print("Error: ", err)
@@ -105,7 +106,8 @@ class PageImage(object):
         # file mytest1.png
         # mytest1.png: PNG image data, 2550 x 3301, 8-bit/color RGB, non-interlaced
 
-        imdat = os.popen('file %s' % imfn).read().split()[4:7]
+        with os.popen('file %s' % imfn) as ifp:
+            imdat = ifp.read().split()[4:7]
         if verbose:
             print(imdat)
         imx = int(imdat[0])
@@ -446,7 +448,8 @@ class LatexToDragDrop(object):
 
             mydir = os.path.dirname(__file__)
             libpath = path(os.path.abspath(mydir + '/lib'))
-            check_code = open(libpath / 'dnd_formulacheck.py').read()
+            with open(libpath / 'dnd_formulacheck.py') as cfp:
+                check_code = cfp.read()
 
             # map from draggable labels to label formula contents
             dmap = {}
