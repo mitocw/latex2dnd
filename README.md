@@ -43,14 +43,14 @@ Options:
   -u IMAGE_URL, --url-for-images=IMAGE_URL
                         base URL for images
   -r RESOLUTION, --resolution=RESOLUTION
-                        Resolution of PNG files in DPI (default 300), can set
-                        to 'max' to auto-scale
-  --cfn=CUSTOM_CFN      Name of python script check function to use for drag-
-                        drop checking
-  --output-tex          Final output should be a tex file (works when input is
-                        a *.dndspec file)
+                        Resolution of PNG files in DPI (default 300), can set to 'max' to auto-scale
+  --cfn=CUSTOM_CFN      Name of python script check function to use for drag-drop checking
+  --output-tex          Final output should be a tex file (works when input is a *.dndspec file)
+  --output-catsoop      Final output should be a markdown file for catsoop
   --cleanup             Remove old solution image files, and tmp.pdf
   --nonrandom           Do not use a random string in the solution filename
+  --tex-options-override
+                        allow options in tex or dndspec file to override command line options
 ```
 
 Example
