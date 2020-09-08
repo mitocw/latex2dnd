@@ -18,7 +18,8 @@ class DndToCatsoop:
         md = "<question drag_and_drop>\n"
         md += xmlmd
         md += "\n"
-        md += 'csq_name="""%s"""\n' % clean_fn
+        md += 'csq_name = """%s"""\n' % clean_fn
+        md += 'csq_nsubmits = %s\n' % l2d.options.get('nsubmits', 10)
         md += "</question>\n"
         with open(ofn, 'w') as fp:
             fp.write(md)
