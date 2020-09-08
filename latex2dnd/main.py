@@ -36,6 +36,7 @@ from lxml import etree
 from collections import OrderedDict
 from .formula import FormulaTester
 from .dndspec import DNDspec2tex
+from .dnd2catsoop import DndToCatsoop
 
 class PageImage(object):
     '''
@@ -508,8 +509,12 @@ class LatexToDragDrop(object):
             else:
                 cacode = ('# custom checking for reusable labels - assumes all targets get some label\n'
                           'import json\n'
-                          'ans = json.loads(submission[0])\n'
                           "correct = ['correct']\n"
+                          'try:\n'
+                          '    ans = json.loads(submission[0])\n'
+                          'except Exception as err:\n'
+                          "    correct = ['incorrect']\n"
+                          '    ans = []\n'
                           "for rule in caset:\n"
                           "    if rule not in ans:\n"
                           "        correct = ['incorrect']\n"
@@ -781,6 +786,11 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
                       dest="output_tex",
                       default=False,
                       help="Final output should be a tex file (works when input is a *.dndspec file)",)
+    parser.add_option("--output-catsoop",
+                      action="store_true",
+                      dest="output_catsoop",
+                      default=False,
+                      help="Final output should be a markdown file for catsoop",)
     parser.add_option("--cleanup",
                       action="store_true",
                       dest="do_cleanup",
@@ -791,6 +801,10 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
                       dest="nonrandom",
                       default=False,
                       help="Do not use a random string in the solution filename",)
+    parser.add_option("--tex-options-override",
+                      action="store_true",
+                      default=False,
+                      help="allow options in tex or dndspec file to override command line options",)
 
     if not opts:
         (opts, args) = parser.parse_args(arglist)
@@ -819,8 +833,13 @@ def CommandLine(opts=None, args=None, arglist=None, return_object=False):
                           can_reuse=opts.can_reuse,
                           custom_cfn=opts.custom_cfn,
                           do_cleanup=opts.do_cleanup,
+                          command_line_options_override=(not opts.tex_options_override),
                           randomize_solution_filename=(not opts.nonrandom),
     )
+    if opts.output_catsoop:
+        d2c = DndToCatsoop(l2d)
+        l2d.d2c = d2c
+
     if return_object:
         return l2d
 

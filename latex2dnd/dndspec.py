@@ -17,7 +17,7 @@ class DNDlabel(object):
     Represent a drag-and-drop draggable label.
     '''
     def __init__(self, tex, index_set=None, draggable_label_set=None, index=None, math_exp=None, draggable_label=None, 
-                 ltype=None, verbose=False, distractor_variable="zzz"):
+                 ltype=None, verbose=False, distractor_variable="zzz", no_math=False):
         '''
         tex = label tex
         index_set = dict of current index values already used, with keys=index, val=DNDlabel objects
@@ -26,12 +26,14 @@ class DNDlabel(object):
         math_exp = should be text formula parsable
         draggable_label = should be alpha only
         ltype = match or distractor
+        no_math = boolean, suppress $ from \DDlabel if True
         '''
         self.tex = tex
         self.index = index
         self.index_set = index_set
         self.draggable_label_set = draggable_label_set
         self.ltype = ltype
+        self.no_math = no_math
         self.verbose = verbose
         self.math_variable = None	# math variable for this label (used in formula sample string)
 
@@ -61,7 +63,10 @@ class DNDlabel(object):
                                                                                                   self.math_variable, self.math_exp,
                                                                                                   self.ltype))
 
-        self.ddlabel = "\\DDlabel[%s]{%s}{$%s$}" % (self.math_exp, self.draggable_label, self.tex)
+        if self.no_math:
+            self.ddlabel = "\\DDlabel[%s]{%s}{%s}" % (self.math_exp, self.draggable_label, self.tex)
+        else:
+            self.ddlabel = "\\DDlabel[%s]{%s}{$%s$}" % (self.math_exp, self.draggable_label, self.tex)
         self.formula_box = [ ]
         self.ddboxes = OrderedDict()	# key=index, val=ddbox string; first one uses self.index
 
@@ -347,6 +352,7 @@ class DNDspec2tex(object):
                 raise Exception(msg)
 
         if self.verbose:
+            print("[dndspec] box_width=%s" % self.box_width)
             print("[dndspec] from file %s read %d match labels, %d labels alltogether, and %d tests" % (sfn,
                                                                                                         len(self.match_labels),
                                                                                                         len(self.all_labels),
@@ -369,12 +375,15 @@ class DNDspec2tex(object):
         user_specified_math_exp = dict(self.label_math_exp)
 
         def make_label(label, cnt, ltype):
+            no_math = 'NO_MATH' in self.dd_options
+            
             return DNDlabel(label,
                             index_set=self.label_objects_by_box_index,
                             draggable_label_set=self.label_objects_by_draggable_id,
                             index=cnt,
                             math_exp=user_specified_math_exp.get(label),
                             verbose=self.verbose,
+                            no_math=no_math,
                             ltype=ltype)
 
         for label in self.match_labels:
