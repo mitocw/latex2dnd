@@ -24,6 +24,7 @@ setup(
     license='LICENSE.txt',
     description='Generate edX drag-and-drop problems using compilation from latex',
     long_description=open('README.txt').read(),
+    long_description_content_type='text/markdown',
     include_package_data=True,
     entry_points={
         'console_scripts': [
