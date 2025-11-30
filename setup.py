@@ -32,7 +32,7 @@ setup(
             ],
         },
     install_requires=['lxml',
-                      'path.py',
+                      'Path',
                       ],
     dependency_links = [
         ],
