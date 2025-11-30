@@ -46,7 +46,7 @@ class DndToCatsoop:
             script = xml.find(".//script")
             cfn = script.text
             cfn += "\n"
-            cfn += "ret = dnd_check_function(None, submission[0])\n"
+            cfn += "ret = dnd_check_function(None, submission[0]['data'])\n"
             cfn += "correct = ['incorrect']\n"
             cfn += "if ret.get('ok'): correct = ['correct']\n"
             cfn += "if 'msg' in ret:\n"

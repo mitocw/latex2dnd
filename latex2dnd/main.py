@@ -502,6 +502,8 @@ class LatexToDragDrop(object):
     
             if not self.options.get('can_reuse', False):
                 cacode = ('ca = [ {"draggables": ca.keys(),"targets": ca.values(),"rule":"exact"} for ca in caset ]\n'
+                          'if "data" in submission[0]:   # for catsoop of 2024\n'
+                          '    submission[0] = submission[0]["data"]\n'
                           'if draganddrop.grade(submission[0], ca):\n'
                           '    correct = ["correct"]\n'
                           'else:\n'
@@ -510,6 +512,8 @@ class LatexToDragDrop(object):
                 cacode = ('# custom checking for reusable labels - assumes all targets get some label\n'
                           'import json\n'
                           "correct = ['correct']\n"
+                          'if "data" in submission[0]:   # for catsoop of 2024\n'
+                          '    submission[0] = submission[0]["data"]\n'
                           'try:\n'
                           '    ans = json.loads(submission[0])\n'
                           'except Exception as err:\n'
