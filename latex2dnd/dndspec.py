@@ -322,8 +322,17 @@ class DNDspec2tex(object):
                     continue
                 self.expression += k
                 continue
+            if mode=="in_extra_header_tex":
+                if k.startswith("END_EXTRA_HEADER_TEX"):
+                    mode = None
+                    continue
+                self.extra_header_tex += k
+                continue
             if k.startswith("BEGIN_EXPRESSION"):
                 mode = "in_expression"
+                continue
+            if k.startswith("BEGIN_EXTRA_HEADER_TEX"):
+                mode = "in_extra_header_tex"
                 continue
             if k.startswith('%') or k.startswith('#'):
                 self.comments += "%" + k[1:]
@@ -841,6 +850,31 @@ TEST_CORRECT: kappa^2 + frac1kappa^2 + 9 * ( -frac1kappa^3 )
     the_err = ""
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
     assert dst.varlist==['frac1kappa', 'kappa']
+
+def test_dndspec_extra_header_block():
+    # test BEGIN_EXTRA_HEADER_TEX ... END_EXTRA_HEADER_TEX multi-line preamble
+    tex = r"""
+BEGIN_EXTRA_HEADER_TEX
+\usepackage{tikz}
+\usepackage{amsfonts}
+\newcommand{\myop}{\hat{O}}
+END_EXTRA_HEADER_TEX
+MATCH_LABELS: G,m_1,m_2,R
+BEGIN_EXPRESSION
+\bea
+    \frac{ G m_1 m_2 }{ R }
+\nonumber
+\eea
+END_EXPRESSION
+CHECK_FORMULA: G * m_1 * m_2 / R
+"""
+    from io import StringIO
+    ofp = StringIO()
+    dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
+    contents = str(ofp.getvalue())
+    assert r'\usepackage{tikz}' in contents
+    assert r'\usepackage{amsfonts}' in contents
+    assert r'\newcommand{\myop}{\hat{O}}' in contents
 
 def test_dndspec8():
     # test math_exp

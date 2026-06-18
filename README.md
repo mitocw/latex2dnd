@@ -185,6 +185,8 @@ LaTeX is powerful, but can be fragile.  A simpler way to write DND
 problems is to use a "dndspec" specification file; this provides a
 simple plain-text based representation of a DND problem.
 
+See **[docs/dndspec.md](docs/dndspec.md)** for full dndspec documentation.
+
 Example:
 
     MATCH_LABELS: G,m_1,m_2,R
@@ -225,7 +227,7 @@ Compile this using
 and you'll get input.tex as the DND latex file (which can be edited
 for futher customizations), together with all the usual output of latex2dnd.
 
-More formally:
+More formally (see [docs/dndspec.md](docs/dndspec.md) for full details):
 
     DELIMETER: <character to use as a delimeter: defaults to ,>
     MATCH_LABELS: <comma separated list of labels appearing in EXPRESSION which should be made into boxes>
@@ -242,6 +244,7 @@ More formally:
     BOX_HEIGHT: draggable label box height to use
     BOX_WIDTH: draggable label box width to use
     EXTRA_HEADER_TEX: a line with extra latex commands to be inserted into the header (may be used multiple times)
+    BEGIN_EXTRA_HEADER_TEX / END_EXTRA_HEADER_TEX: multi-line block alternative to EXTRA_HEADER_TEX
     OPTIONS: <dnd_options string>
 
 There should be no leading spaces / indentation on lines with keywords (like MATCH_LABELS).
