@@ -7,3 +7,11 @@
 *     .6: add \DDoptins{CUSTOM_CFN=xxx} and --cfn=xxx command line for custom DND result check function
 * v1.0.0: add unit tests for DDformula, which automatically verify expected response is checked properly
 * v1.1.0: implement dndspec, a simplified DND problem specification language
+* v1.2.0: add BEGIN_EXTRA_HEADER_TEX / END_EXTRA_HEADER_TEX multi-line preamble block to dndspec
+*         fix pytest failure under Python 3.10 (except-clause variable scoping, PEP 3110)
+*         add docs/dndspec.md with full dndspec documentation; update README.md to point to it
+* v1.3.0: Python 3.10 compatibility fixes
+*         replace removed numpy.complex alias with builtin complex
+*         wrap math.factorial to accept integer-valued floats (as produced by expression evaluator)
+*         add conftest.py so calc sub-package tests resolve correctly under pytest
+*         add path package to install_requires

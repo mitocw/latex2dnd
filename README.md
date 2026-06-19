@@ -292,4 +292,6 @@ History
 * v1.0.0: add unit tests for DDformula, which automatically verify expected response is checked properly
 * v1.1.0: implement dndspec, a simplified DND problem specification language
 *     .1: more improvements to dndspec; use random string in solution image filename; add examples
+* v1.2.0: add BEGIN_EXTRA_HEADER_TEX / END_EXTRA_HEADER_TEX; fix pytest under Python 3.10; add dndspec docs
+* v1.3.0: Python 3.10 compatibility — replace removed numpy.complex alias, fix math.factorial for float args, fix calc test discovery
 ```

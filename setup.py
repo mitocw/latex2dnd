@@ -15,7 +15,7 @@ data_files = [
 
 setup(
     name='latex2dnd',
-    version='1.2.0',
+    version='1.3.0',
     author='I. Chuang',
     author_email='ichuang@mit.edu',
     packages=['latex2dnd', 'latex2dnd.test'],
@@ -32,8 +32,9 @@ setup(
             ],
         },
     install_requires=['lxml',
-                      'Path',
+                      'path',
                       ],
+    python_requires='>=3.10',
     dependency_links = [
         ],
     package_dir={'latex2dnd': 'latex2dnd'},
