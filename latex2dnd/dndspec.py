@@ -226,6 +226,7 @@ class DNDspec2tex(object):
         self.parse_file(sfn, input_tex=input_tex, default_dpi=default_dpi)
         self.assemble_labels()
         self.assemble_dnd_expression()
+        self.assemble_saveboxes()
         self.assemble_dnd_formula()
         self.assemble_formula_tests()
         self.generate_tex()
@@ -262,6 +263,7 @@ class DNDspec2tex(object):
         self.label_math_exp = []	# list of (label, math_exp) as specified by user -- useful for giving numerical math_exp to text labels
         self.dnd_feedback = None
         self.dnd_feedback_tex = ""
+        self.use_savebox = False
         
         mode = None
         if not input_tex:
@@ -294,7 +296,8 @@ class DNDspec2tex(object):
             test_formula = ' ' + s + ' '            
             return {'etype': 'incorrect', 'formula': test_formula}
 
-        keyword_table = {'BOX_WIDTH': {'field': 'box_width', 'func': None},
+        keyword_table = {'USE_SAVEBOX': {'field': 'use_savebox', 'func': lambda x: True},
+                         'BOX_WIDTH': {'field': 'box_width', 'func': None},
                          'BOX_HEIGHT': {'field': 'box_height', 'func': None},
                          'DELIMETER': {'field': 'label_delimeter', 'func': None},
                          'EXTRA_HEADER_TEX': {'field': 'extra_header_tex', 'func': None, 'add': True},
@@ -340,6 +343,10 @@ class DNDspec2tex(object):
             if len(k.strip())==0:	# skip empty lines
                 continue
 
+            if k.strip() == 'USE_SAVEBOX':
+                self.use_savebox = True
+                continue
+
             kwfound = False
             for kw, kwinfo in list(keyword_table.items()):
                 m = re.match('^%s:(.*)' % kw, k)
@@ -360,8 +367,13 @@ class DNDspec2tex(object):
                 print(msg)
                 raise Exception(msg)
 
+        if 'tikz' in self.extra_header_tex.lower():
+            self.use_savebox = True
+
         if self.verbose:
             print("[dndspec] box_width=%s" % self.box_width)
+            if self.use_savebox:
+                print("[dndspec] use_savebox=True")
             print("[dndspec] from file %s read %d match labels, %d labels alltogether, and %d tests" % (sfn,
                                                                                                         len(self.match_labels),
                                                                                                         len(self.all_labels),
@@ -465,6 +477,45 @@ class DNDspec2tex(object):
         self.dnd_expression = dnd_expression
         if self.verbose:
             print("[dndspec] dnd_expression=%s" % self.dnd_expression)
+
+    @staticmethod
+    def _index_to_alphanum(n):
+        """Convert 1-based integer to two-letter code: 1->aa, 2->ab, ..., 26->az, 27->ba, ..."""
+        n -= 1
+        return chr(ord('a') + n // 26) + chr(ord('a') + n % 26)
+
+    def assemble_saveboxes(self):
+        """
+        If use_savebox is set, scan dnd_expression for every \\DDxxx{n}{label} box macro,
+        assign each occurrence a \\DBXxx savebox name, rewrite the expression to use
+        \\usebox{\\DBXxx}, and store the preamble declarations and pre-expression definitions.
+        """
+        if not self.use_savebox:
+            self.savebox_declarations = ""
+            self.savebox_definitions = ""
+            return
+
+        pattern = r'\\DD(B+)\{(\d+)\}\{([^}]+)\}'
+        declarations = []
+        definitions = []
+        counter = [0]
+
+        def replace_with_savebox(m):
+            counter[0] += 1
+            alphanum = self._index_to_alphanum(counter[0])
+            boxname = r'\DBX' + alphanum
+            dd_cmd = m.group(0).strip()
+            declarations.append(r'\newsavebox{' + boxname + '}')
+            definitions.append(r'\savebox{' + boxname + '}{' + dd_cmd + '}')
+            return r' \usebox{' + boxname + '} '
+
+        self.dnd_expression = re.sub(pattern, replace_with_savebox, self.dnd_expression)
+
+        self.savebox_declarations = '\n'.join(declarations)
+        self.savebox_definitions = '\n'.join(definitions)
+
+        if self.verbose:
+            print("[dndspec] savebox: %d boxes declared" % counter[0])
 
     def formula_to_boxed(self, formula, labelset=None, exit_on_failure=True, missing_ok=False):
         '''
@@ -623,6 +674,8 @@ class DNDspec2tex(object):
                   'RESOLUTION': self.resolution,
                   'DD_OPTIONS': self.dd_options,
                   'DD_FEEDBACK': self.dnd_feedback_tex,
+                  'SAVEBOX_DECLARATIONS': self.savebox_declarations,
+                  'SAVEBOX_DEFINITIONS': self.savebox_definitions,
                   }
         for key, val in list(params.items()):
             try:
@@ -850,6 +903,56 @@ TEST_CORRECT: kappa^2 + frac1kappa^2 + 9 * ( -frac1kappa^3 )
     the_err = ""
     dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
     assert dst.varlist==['frac1kappa', 'kappa']
+
+def test_dndspec_use_savebox_explicit():
+    # explicit USE_SAVEBOX flag replaces \DDB with \usebox{\DBXxx}
+    tex = r"""
+USE_SAVEBOX
+MATCH_LABELS: G, m_1, m_2
+BEGIN_EXPRESSION
+\bea
+    \frac{ G m_1 m_2 }{ R }
+\nonumber
+\eea
+END_EXPRESSION
+CHECK_FORMULA: G * m_1 * m_2
+"""
+    from io import StringIO
+    ofp = StringIO()
+    dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp)
+    contents = ofp.getvalue()
+    assert r'\newsavebox{\DBXaa}' in contents
+    assert r'\newsavebox{\DBXab}' in contents
+    assert r'\newsavebox{\DBXac}' in contents
+    assert r'\usebox{\DBXaa}' in contents or r'\usebox{\DBXab}' in contents
+    # \DDB should appear only inside \savebox{...}{...} definitions, not raw in the expression
+    assert r'\savebox{\DBXaa}{\DDB{' in contents
+
+
+def test_dndspec_use_savebox_auto_tikz():
+    # tikz in header automatically enables USE_SAVEBOX
+    tex = r"""
+BEGIN_EXTRA_HEADER_TEX
+\usepackage{tikz}
+END_EXTRA_HEADER_TEX
+MATCH_LABELS: a, b
+BEGIN_EXPRESSION
+\begin{tikzpicture}
+  \node {$ a $};
+  \node {$ b $};
+\end{tikzpicture}
+END_EXPRESSION
+CHECK_FORMULA: a * b
+"""
+    from io import StringIO
+    ofp = StringIO()
+    dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp)
+    assert dst.use_savebox is True
+    contents = ofp.getvalue()
+    assert r'\newsavebox' in contents
+    assert r'\savebox' in contents
+    assert r'\usebox' in contents
+
 
 def test_dndspec_extra_header_block():
     # test BEGIN_EXTRA_HEADER_TEX ... END_EXTRA_HEADER_TEX multi-line preamble

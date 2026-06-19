@@ -736,10 +736,13 @@ class LatexToDragDrop(object):
                 if label.endswith('-ll'):
                     x = [m.group(2)]
                     y = [m.group(3)]
-                else:
+                else:			# ur
                     x.append(m.group(2))
                     y.append(m.group(3))
                     label = label[:-3]
+                    if label in BoxSet:	# allow multiple instances of box
+                        label += "a"
+                    # print(f"label = {label}")
                     b = Box('%s: %s, %s, %s, %s' % (label, x[0], y[0], x[1], y[1]))
                     BoxSet[b.label] = b
         
