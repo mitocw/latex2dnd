@@ -9,17 +9,35 @@ solution image, from an input latex file.
 Installation
 ------------
 
-    pip install -e git+https://github.com/mitocw/latex2dnd.git#egg=latex2dnd
+**System dependencies** (required before installing the Python package):
 
-Note that pdftoppm is needed.  With osX and macbrew:
+On macOS with Homebrew:
 
-    brew install netpbm poppler
+    brew install netpbm poppler imagemagick
+    brew install --cask mactex-no-gui
 
-Also imagemagick is required
+On Ubuntu/Debian:
 
-    brew install imagemagick
+    sudo apt-get install texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+        poppler-utils imagemagick
 
-A working latex installation is also required.
+**Python package** (from PyPI):
+
+    pip install latex2dnd
+
+**From source** (latest development version):
+
+    pip install git+https://github.com/mitocw/latex2dnd.git
+
+**Development installation** (editable, with test dependencies):
+
+    git clone https://github.com/mitocw/latex2dnd.git
+    cd latex2dnd
+    pip install -e ".[test]"
+
+Run the test suite after installing in development mode:
+
+    pytest -v
 
 Usage
 -----
@@ -294,4 +312,5 @@ History
 *     .1: more improvements to dndspec; use random string in solution image filename; add examples
 * v1.2.0: add BEGIN_EXTRA_HEADER_TEX / END_EXTRA_HEADER_TEX; fix pytest under Python 3.10; add dndspec docs
 * v1.3.0: Python 3.10 compatibility — replace removed numpy.complex alias, fix math.factorial for float args, fix calc test discovery
+* v1.4.0: switch to pyproject.toml; add GitHub Actions CI (Python 3.10–3.12)
 ```

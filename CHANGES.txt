@@ -15,3 +15,6 @@
 *         wrap math.factorial to accept integer-valued floats (as produced by expression evaluator)
 *         add conftest.py so calc sub-package tests resolve correctly under pytest
 *         add path package to install_requires
+* v1.4.0: switch packaging from setup.py to pyproject.toml (PEP 517/518)
+*         add test optional-dependencies (pytest, numpy, scipy, pyparsing)
+*         add GitHub Actions CI workflow (tests against Python 3.10, 3.11, 3.12)
