@@ -719,13 +719,13 @@ CHECK_FORMULA: 2 * v / ( mu * Bprime )
 """
     from io import StringIO
     ofp = StringIO()
-    err = ''
+    caught_err = ''
     try:
         dst = DNDspec2tex("stdin", input_tex=tex, output_fp=ofp, verbose=True)
     except Exception as err:
-        pass
-    print(str(err))
-    assert "WARNING: no matching label 'mu' found" in str(err)
+        caught_err = str(err)
+    print(caught_err)
+    assert "WARNING: no matching label 'mu' found" in caught_err
 
 def test_dndspec3():
     # ensure variable order is maintained in samples (for test stability)

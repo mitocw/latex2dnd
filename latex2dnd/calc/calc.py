@@ -17,6 +17,12 @@ from pyparsing import (
 )
 from functools import reduce
 
+def _require_int(x):
+    if x != int(x):
+        raise ValueError("factorial requires a non-negative integer, got {0}".format(x))
+    return int(x)
+
+
 DEFAULT_FUNCTIONS = {
     'sin': numpy.sin,
     'cos': numpy.cos,
@@ -36,8 +42,8 @@ DEFAULT_FUNCTIONS = {
     'arccsc': functions.arccsc,
     'arccot': functions.arccot,
     'abs': numpy.abs,
-    'fact': math.factorial,
-    'factorial': math.factorial,
+    'fact': lambda x: math.factorial(_require_int(x)),
+    'factorial': lambda x: math.factorial(_require_int(x)),
     'sinh': numpy.sinh,
     'cosh': numpy.cosh,
     'tanh': numpy.tanh,
@@ -52,8 +58,8 @@ DEFAULT_FUNCTIONS = {
     'arccoth': functions.arccoth
 }
 DEFAULT_VARIABLES = {
-    'i': numpy.complex(0, 1),
-    'j': numpy.complex(0, 1),
+    'i': complex(0, 1),
+    'j': complex(0, 1),
     'e': numpy.e,
     'pi': numpy.pi,
     'k': scipy.constants.k,  # Boltzmann: 1.3806488e-23 (Joules/Kelvin)
