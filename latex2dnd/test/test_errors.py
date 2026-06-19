@@ -31,9 +31,8 @@ class TestGravityWithErrors(unittest.TestCase):
 
             err = None
             try:
-                l2dnd = LatexToDragDrop(nfn, verbose=True)
+                l2dnd = LatexToDragDrop(nfn, verbose=False, latex_passes=1)
             except Exception as err:
-                print("Error = %s" % str(err))
                 self.assertTrue('DDformula test [1] ERROR!' in str(err))
 
     def test_gravity_with_formula_errors(self):
@@ -48,9 +47,8 @@ class TestGravityWithErrors(unittest.TestCase):
 
             err = None
             try:
-                l2dnd = LatexToDragDrop(nfn, verbose=True)
+                l2dnd = LatexToDragDrop(nfn, verbose=False, latex_passes=1)
             except Exception as err:
-                print("Error = %s" % str(err))
                 self.assertTrue('DDformula test [1] ERROR!' in str(err))
 
     def test_gravity_with_expected_answer_error(self):
@@ -65,9 +63,8 @@ class TestGravityWithErrors(unittest.TestCase):
 
             err = None
             try:
-                l2dnd = LatexToDragDrop(nfn, verbose=True)
+                l2dnd = LatexToDragDrop(nfn, verbose=False, latex_passes=1)
             except Exception as err:
-                print("Error = %s" % str(err))
                 self.assertTrue('DDformula test [1] ERROR!' in str(err))
 
 if __name__ == '__main__':

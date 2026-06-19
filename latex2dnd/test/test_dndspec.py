@@ -8,7 +8,8 @@ try:
 except:
     from path import Path as path
 import latex2dnd as l2dndmod
-from latex2dnd.main import LatexToDragDrop, CommandLine
+from latex2dnd.main import LatexToDragDrop
+from latex2dnd.dndspec import DNDspec2tex
 from io import StringIO
 
 @contextlib.contextmanager
@@ -29,7 +30,9 @@ class TestDNDspec(unittest.TestCase):
             os.system('cp %s/* %s' % (testdir, tmdir))
             os.chdir(tmdir)
             # l2dnd = LatexToDragDrop(nfn, verbose=True)
-            l2d = CommandLine(arglist=["-v", nfn, '--nonrandom'], return_object=True)
+            s2t = DNDspec2tex(nfn, verbose=False)
+            l2d = LatexToDragDrop(s2t.tex_filename, verbose=False,
+                                  randomize_solution_filename=False, latex_passes=1)
 
             pre = nfn.rsplit('.', 1)[0]
             auxfn = pre + ".aux"

@@ -38,6 +38,13 @@ from .formula import FormulaTester
 from .dndspec import DNDspec2tex
 from .dnd2catsoop import DndToCatsoop
 
+def _run(cmd, verbose):
+    """Run a shell command, discarding stdout+stderr when not verbose."""
+    if not verbose:
+        cmd += ' > /dev/null 2>&1'
+    os.system(cmd)
+
+
 class PageImage(object):
     '''
     Grab page of PDF, convert to PNG, and get HighRes BoundingBox for image
@@ -60,7 +67,7 @@ class PageImage(object):
         cmd = "pdfseparate -l %s -f %s %s tmp.pdf" % (page, page, fn)
         if verbose:
             print(cmd)
-        os.system(cmd)
+        _run(cmd, verbose)
         if not os.path.exists("tmp.pdf"):
             raise Exception("===> [latex2dnd] error running pdfseparate, command: %s" % cmd)
 
@@ -99,6 +106,8 @@ class PageImage(object):
 
         # generate PNG from cropped PDF
         cmd = "pdftoppm -r %s -png %s > %s" % (dpi, pdfimfn, imfn)
+        if not verbose:
+            cmd += ' 2>/dev/null'
         if verbose:
             print(cmd)
         os.system(cmd)
@@ -133,10 +142,10 @@ class PageImage(object):
                                                                      outfn=outfn)
         if self.verbose:
             print(cmd)
-        os.system(cmd)
+        _run(cmd, self.verbose)
         if not os.path.exists(outfn):
             raise Exception("===> [latex2dnd] error running convert, command: %s" % cmd)
-        
+
     def WhiteBox(self, boxes, outfn=None):
         '''
         White-out image area where box is positioned.
@@ -161,7 +170,7 @@ class PageImage(object):
                                                         outfn=outfn)
         if self.verbose:
             print(cmd)
-        os.system(cmd)
+        _run(cmd, self.verbose)
         if not os.path.exists(outfn):
             raise Exception("===> [latex2dnd] error running convert, command: %s" % cmd)
 
@@ -176,12 +185,12 @@ class PageImage(object):
         if outfn is None:
             outfn = self.imfn[:-4] + '_extract.png'
 
-        cmd = 'convert {imfn} -crop {geom} {outfn}'.format(imfn=self.imfn, 
+        cmd = 'convert {imfn} -crop {geom} {outfn}'.format(imfn=self.imfn,
                                                            geom=geom,
                                                            outfn=outfn)
         if self.verbose:
             print(cmd)
-        os.system(cmd)
+        _run(cmd, self.verbose)
         if not os.path.exists(outfn):
             raise Exception("===> [latex2dnd] error running convert, command: %s" % cmd)
 
@@ -283,7 +292,7 @@ class LatexToDragDrop(object):
     def __init__(self, texfn, compile=True, verbose=True, dpi=300, imverbose=False, outdir='.',
                  can_reuse=False, custom_cfn=None, randomize_solution_filename=True, do_cleanup=False,
                  command_line_options_override=True,
-                 interactionmode=None):
+                 interactionmode='nonstopmode', latex_passes=2):
         '''
         texfn = *.tex filename
 
@@ -302,14 +311,13 @@ class LatexToDragDrop(object):
                 
             if verbose:
                 print("Setting TEXINPUTS=%s" % os.environ['TEXINPUTS'])
-                print("Running latex twice")
+                print("Running latex %d time(s)" % latex_passes)
                 print("-"*77)
             imstr = ""
             if interactionmode:
                 imstr = "-interaction=%s" % interactionmode
-            # run pdflatex TWICE
-            for k in range(2):
-                os.system('pdflatex %s %s' % (imstr, texfn))
+            for k in range(latex_passes):
+                _run('pdflatex %s %s' % (imstr, texfn), verbose)
             if verbose:
                 print("="*77)
 
