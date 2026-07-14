@@ -2,14 +2,15 @@
 Handle DDformula script testing
 '''
 
-import imp
+import importlib.util
 import sys
 import json
 
 def import_from_string(codestr, name='codestr'):
     """Import a module from a specified string.
     """
-    mod = imp.new_module(name)
+    spec = importlib.util.spec_from_loader(name, loader=None)
+    mod = importlib.util.module_from_spec(spec)
     mod.__file__ = "codestr"
     code = compile(codestr, '.', 'exec', dont_inherit=True)
     exec(code, mod.__dict__)
