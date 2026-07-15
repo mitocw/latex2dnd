@@ -161,7 +161,11 @@ class PageImage(object):
         for box in boxes:
             # make sure box is set for context of this image
             box.offset_by_bb(self.hrbb) 
-            geom = box.png_geom(self.sizex, self.sizey, delta=4.5)
+            # png_geom has a historical 4-pixel downward offset.  Trim the
+            # same amount from the white-out height so it does not cover the
+            # bottom target border.
+            geom = box.png_geom(self.sizex, self.sizey, delta=4.5,
+                                bottom_trim=4)
 
             regions.append('-region {geom} -threshold -1 '.format(geom=geom))
 
@@ -258,17 +262,18 @@ class Box(object):
         return list(map(in_to_px, [self.pos[0], ysize-self.pos[1], self.pos[2], ysize-self.pos[3]]))
 
 
-    def png_geom(self, imx, imy, delta=0):
+    def png_geom(self, imx, imy, delta=0, bottom_trim=0):
         '''
         return geometry string for box, in units of pixels (for PNG file)
         it is assumed that the PNG file has a width which imx which is
         equal to that given by hrbb, i.e. hrbb[2]-hrbb[0].
 
         the geometry string uses a coordinate system with (0,0) in the upper left
+        bottom_trim removes additional pixels from the bottom of the region
         '''
         pp = self.png_pos(imx, imy)
         dx = int(pp[2] - pp[0] - 2*delta)
-        dy = int(pp[1] - pp[3] - 2*delta)
+        dy = int(pp[1] - pp[3] - 2*delta - bottom_trim)
         geom = '%dx%d+%d+%d' % (dx, dy, int(pp[0]+delta), int(pp[3]+4+delta))
         return geom
 
